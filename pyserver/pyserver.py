@@ -16,14 +16,16 @@ import spidev
 
 
 count = 0
-
+time_out = 10 #シリアル通信の再送信回数の上限
 
 volume=0
 b=1
 G=0
 data=0
 
-pin_num=[5,6,13,19,26,16,20,21,25] #SPI実装にGPIO8をGPIO12に変更
+pin_num=[5,6,13,19,26,16,20,21,25] #使用するgpioピン番号
+n_pin=9 #使用するgpioピン数
+
 str1='0'
 op = {'inst': '0','ForB': '0','SPEED': '0','CW':'0','ptn':'0','SIZE':'0'}
 timer1=0
@@ -31,7 +33,7 @@ index=0
 
 led_pin={}
 inst2={}
-for i in range(8):
+for i in range(n_pin):
     led_pin[i]=LED(pin_num[i])
 
 
@@ -58,15 +60,21 @@ class Server_class(BaseHTTPRequestHandler):
                 index=0;
                 
             elif inst['inst'][0]=='EXECUTE':
+                error=0
                 for i in range(0,index):
                     inst = inst2[i]
-
+                    if (error==1):
+                        for i in range(n_pin):
+                            led_pin[i].off()
+                        print('ERROR')
+                        break
+                    
                     if inst['inst'][0]=='START':
                         led_pin[0].on()
                         print('START')
                     
                     elif inst['inst'][0]=='STOP':
-                        for i in range(8):
+                        for i in range(n_pin):
                             led_pin[i].off()                  
                         print('STOP')
                     
@@ -341,61 +349,66 @@ class Server_class(BaseHTTPRequestHandler):
                         spi.open(0, CE)
                         spi.mode = 3
                         spi.max_speed_hz = 115200
-                        writeData = 0
+                        writeData =  [int(op['turnsize'])]
                         i=0
-                        a=0
-                        b=-1
-                        
+                        a=writeData[0]
+                        b=-999999
+                        error=0
                         led_pin[8].on()
-
                         
-                        while (a!= b):
-                            writeData = [int(op['turnsize'])]
-                            a=writeData[0]
+                        
+                        while (a != b):
                             
-                            while (a!= b):
-                                print("a")
-                                #print(i)
-                                print(a)
-                                writeData[0]=a
-                                writeData2=[0]
-                                if (a > 255):
-                                    writeData[0]=writeData[0] % 256
-                                writeData2[0]=int(a/256)
-                                #writeData=str(writeData)
-                                print(writeData)
-                                print(writeData2)
-                                spi.xfer(writeData2)
-                                #print("C")
-                                time.sleep(0.1)
-                                spi.xfer(writeData)
-                                #print("D")
-                                time.sleep(0.1)
-                                resp = spi.xfer2([0x00,0x00]) 
-                                #print("E")
-                                resp2 = spi.xfer2([0x00,0x00])                 #SPI通信で値を読み込む
+                            if(i > time_out):
+                                error=1
+                                break
+                            i+=1    
+                            print(i)
+                            print(a)
+                            writeData[0]=a
+                            writeData2=[0]
+                            if (a > 255):
+                                writeData[0]=writeData[0] % 256
+                            writeData2[0]=int(a/256)
+                            #writeData=str(writeData)
+                            print(writeData)
+                            print(writeData2)
+                            spi.xfer(writeData2)
+                            #print("C")
+                            time.sleep(0.1)
+                            spi.xfer(writeData)
+                            #print("D")
+                            time.sleep(0.1)
+                            resp = spi.xfer2([0x00,0x00]) 
+                            #print("E")
+                            resp2 = spi.xfer2([0x00,0x00])                 #SPI通信で値を読み込む
             
-                                #print(resp)
-                                #print(resp2)
-                                #print(resp[1]*256+resp2[0])
-                                i+=1
-                                b=resp[1]*256+resp2[0]
-            
-                                time.sleep(0.1)
-                        led_pin[8].off()
-                        print("c")
-                        spi.close()
-                        if op['CW']=='0':
-                                    led_pin[4].on()
-                                    led_pin[5].off()
-                                    led_pin[6].on()
-                                    led_pin[7].on()
+                            #print(resp)
+                            #print(resp2)
+                            #print(resp[1]*256+resp2[0])
                                 
-                        elif op['CW']=='1':
-                                    led_pin[4].on()
-                                    led_pin[5].on()
-                                    led_pin[6].on()
-                                    led_pin[7].off()
+                            b=resp[1]*256+resp2[0]
+                            time.sleep(0.1)
+                                
+                        led_pin[8].off()
+                        spi.close()
+                        if(error==1):
+                            print("Value setting is incomplete")
+                            
+                        else:
+                            print("Value setting is complete")
+                        
+                            if op['CW']=='0':
+                                led_pin[4].on()
+                                led_pin[5].off()
+                                led_pin[6].on()
+                                led_pin[7].on()
+                                
+                            elif op['CW']=='1':
+                                led_pin[4].on()
+                                led_pin[5].on()
+                                led_pin[6].on()
+                                led_pin[7].off()
                     
                     elif inst['inst'][0]=='SLEEP' or inst['inst'][0]=='SLEEP_A':
                         for key in inst:
@@ -424,7 +437,7 @@ def run():
 
 print('start')
 
-for i in range(8):
-    led_pin[i].on
+for i in range(n_pin):
+    led_pin[i].off()
 
 run()
