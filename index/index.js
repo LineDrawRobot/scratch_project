@@ -1218,7 +1218,7 @@ log.log("円:",grid, V3, p);
                 const server="http://localhost:8000?";
                 const inst = "inst_n="+(inst_n++)+"&inst=CIRCLE3";
                 const text1 = "&CW="+menu_5[Cast.toString(args.GRID)];
-                const text2 = "&turnsize="+Cast.toNumber(args.RADIUS);
+                const text2 = "&turnsize="+Cast.toNumber(args.RADIUS)*100;
                 const text = server+inst+text1+text2;
 
                 additional_time=correction_time;
