@@ -31,7 +31,7 @@ var vl = 50;
 var d = 45;//機体サイズ
 var correction_time=3.0;//補正時間
 var serial_time=0.5;//シリアル通信時間
-const raspi=0;
+const raspi=1;
 //////////////////////////////////////////
 
 const speed1='低速(約'+teisoku_speed+'cm/s)';
