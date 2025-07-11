@@ -1,0 +1,16 @@
+[Unit]
+Description=My Startup Script
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/autodownloder.sh
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=on-failure
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
