@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/scratch.sh
+Icon=/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/newblocks.png
+Name[ja_JP]=ライン引きロボットソフトウェアの起動.desktop
