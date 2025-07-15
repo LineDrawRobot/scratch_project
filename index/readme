@@ -1,4 +1,8 @@
 ver1
-・githubオンライン版とラズパイローカル版の両方で対応　
-　const raspi=0; 　を書き換える　0→githubモード、1→ラズパイモード
+・githubオンライン版とラズパイローカル版の両方に対応　
+　const raspi=0; 　//　0→githubモード、1→ラズパイモード
 ・
+
+ver2
+・rapi5用に変更（gpiozero)
+・シリアル通信(SPI)方法の見直し
