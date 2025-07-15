@@ -1,7 +1,20 @@
 ライン引きロボットにおいて情報をシリアル（SPI）通信で送信するためのライブラリ
 
-serial_spi.hを　　C:\Users\ユーザー名\Documents\Arduino IDE\libraries\serial_spi\　の下に入れる
-※serial_spiフォルダがない場合は作成する。
+１．serial_spi.hを以下のフォルダに入れてコンパイルする
+
+　C:\Users\ユーザー名\Documents\Arduino IDE\libraries\serial_spi\　
+
+　※serial_spiフォルダがない場合は作成する。
+
+２．メインプログラムで以下の関数を挿入してください。
+
+　//setupに入れる
+　serial_setup();
+
+　//シリアル通信で情報を受け取りたいところに入れる
+　//関数がちゃんと処理できた場合は変数serial_dataに情報が入っている。
+　serial_com();
+
 
 ver1
 ・円軌道における半径情報を送信
