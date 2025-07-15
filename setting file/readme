@@ -1,1 +1,30 @@
-起動時の初期化用ファイル
+〇起動時の初期化用ファイル
+ index.jsとpyserver.pyの自動アップデートとgpioの初期化をOS起動時に行う
+
+ １．以下のファイルを以下のフォルダに入れる
+ ・autodownloder.sh
+ ・init.py
+  /home/pi/scratch\scratch-vm\src\extensions\scratch3_newblocks/
+  
+  ２．以下のファイルを以下のフォルダに入れ、以下のコマンドを初回だけ実行
+ ・startup.service
+  /etc/systemd/system/
+
+  $sudo systemctl daemon-reexec
+  $sudo systemctl daemon-reload
+  $sudo systemctl enable myservice.service
+  $reboot
+
+
+〇プログラミングソフトウェアの起動ファイル
+　ワンクリックでソフトを起動させる
+
+　１．以下のファイルを以下のフォルダに入れる
+　・newblocks.png
+　・scratch.sh
+　 /home/pi/scratch\scratch-vm\src\extensions\scratch3_newblocks/
+　
+　２．以下のファイルをデスクトップに置く
+　・scratch.desktop
+
+  ３．scratch.desktopをダブルクリック→実行で一定時間後にブラウザが立ち上がりプログラミングができる
