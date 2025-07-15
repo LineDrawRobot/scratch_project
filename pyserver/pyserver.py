@@ -344,51 +344,40 @@ class Server_class(BaseHTTPRequestHandler):
                     elif inst['inst'][0]=='CIRCLE3':
                         for key in inst:
                             op[key]=inst[key][0]
-                        CE = 0
+
                         spi = spidev.SpiDev()
-                        spi.open(0, CE)
-                        spi.mode = 3
+                        spi.open(0, 0)  # SPI0, CE0
                         spi.max_speed_hz = 115200
-                        writeData =  [int(op['turnsize'])]
+                        spi.mode = 1  # SPI MODE 1
+                        t_size =  int(op['turnsize'])
                         i=0
-                        a=writeData[0]
-                        b=-999999
+                        
+                        tx_data=[0x00,0x00]
+                        print("bb")
+                        tx_data[1]=t_size>>8
+                        print("aa")
+                        tx_data[0]=t_size&0xFF
+                        
+                        print(tx_data)
+                        rx_data=[0xFF,0xFF]
                         error=0
                         led_pin[8].on()
-                        
-                        
-                        while (a != b):
+                                               
+                        while (tx_data != rx_data):
                             
                             if(i > time_out):
                                 error=1
                                 break
                             i+=1    
-                            print(i)
-                            print(a)
-                            writeData[0]=a
-                            writeData2=[0]
-                            if (a > 255):
-                                writeData[0]=writeData[0] % 256
-                            writeData2[0]=int(a/256)
-                            #writeData=str(writeData)
-                            print(writeData)
-                            print(writeData2)
-                            spi.xfer(writeData2)
-                            #print("C")
+                            tx_data2=tx_data[:]
+                            print(f"送信データ: {[f'{b:04X}' for b in tx_data]}")
                             time.sleep(0.1)
-                            spi.xfer(writeData)
-                            #print("D")
+                            rx_data = spi.xfer2(tx_data2)    #SPI通信でデータ送信
+                            time.sleep(0.1) 
+                            rx_data = spi.xfer2([0x00,0x00])   #ダミーデータを送信して、受信データ確認              
                             time.sleep(0.1)
-                            resp = spi.xfer2([0x00,0x00]) 
-                            #print("E")
-                            resp2 = spi.xfer2([0x00,0x00])                 #SPI通信で値を読み込む
-            
-                            #print(resp)
-                            #print(resp2)
-                            #print(resp[1]*256+resp2[0])
-                                
-                            b=resp[1]*256+resp2[0]
-                            time.sleep(0.1)
+                            print(f"受信データ: {[f'{b:04X}' for b in rx_data]}")
+                               
                                 
                         led_pin[8].off()
                         spi.close()
@@ -429,6 +418,8 @@ class Server_class(BaseHTTPRequestHandler):
             print(e.args)
             print(e)
             print()
+            for i in range(n_pin):
+                led_pin[i].off()
 
 def run():
     server_address=('localhost',8000)
