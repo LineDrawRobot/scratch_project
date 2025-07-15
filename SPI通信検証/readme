@@ -1,1 +1,6 @@
-arudino dueとraspi5のSPI通信の検証
+arudino dueとraspi5のSPI通信の検証   
+raspiがマスター　arudinoがスレーブ
+マスターから送られた情報をオウム返しする
+
+serial_test.ino　・・　arudino due用
+serial_test.py　　・・　raspi用
