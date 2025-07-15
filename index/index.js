@@ -31,7 +31,11 @@ var vl = 50;
 var d = 45;//機体サイズ
 var correction_time=3.0;//補正時間
 var serial_time=0.5;//シリアル通信時間
+const min_radius = 50; 　　//半径の範囲
+const max_radius = 10000;　//半径の範囲
+
 const raspi=1;
+
 //////////////////////////////////////////
 
 const speed1='低速(約'+teisoku_speed+'cm/s)';
@@ -55,7 +59,7 @@ var menu_9 = {'1cm':1,'10cm':10,'1m':100};
 var ptn = {'A':1,'B':2}; //ptn
 //python対応
 
-
+const circule_text= '[GRID]に半径[RADIUS]m（'+min_radius/100+'~'+max_radius/100+'）の円軌道をさせる';
 
 //変数
 var mode = 0;
@@ -481,9 +485,10 @@ class Scratch3NewBlocks {
                 },
                 
                {
+                   
                    opcode: 'fetchURL19',
                    blockType: BlockType.COMMAND,
-                   text:'[GRID]に半径[RADIUS]mの円軌道をさせる',
+                   text:'[GRID]に半径[RADIUS]m（範囲：'+min_radius/100+'~'+max_radius/100+'）の円軌道をさせる',
                    arguments:{
                      GRID:{
                           type:ArgumentType.STRING,
@@ -1218,7 +1223,13 @@ log.log("円:",grid, V3, p);
                 const server="http://localhost:8000?";
                 const inst = "inst_n="+(inst_n++)+"&inst=CIRCLE3";
                 const text1 = "&CW="+menu_5[Cast.toString(args.GRID)];
-                const text2 = "&turnsize="+Cast.toNumber(args.RADIUS)*100;
+                var num = Math.floor(Cast.toNumber(args.RADIUS)*100);
+                
+                if(num < min_radius) num = min_radius;
+                else if(num > max_radius) num = max_radius;
+                else num = num;
+                
+                const text2 = "&turnsize="+num;//+Cast.toNumber(args.RADIUS)*100;
                 const text = server+inst+text1+text2;
 
                 additional_time=correction_time;
