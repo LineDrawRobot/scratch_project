@@ -11,6 +11,8 @@ const Clone = require('../../util/clone');
 const RenderedTarget = require('../../sprites/rendered-target');
 const StageLayering = require('../../engine/stage-layering');
 const fetch = require("node-fetch");
+const Scratch3LooksBlocks = require('../../blocks/scratch3_looks');
+const Scratch3PenBlocks = require('../scratch3_pen/index');
 
 /**
  * Icon svg to be displayed at the left edge of each extension block, encoded as a data URI.
@@ -34,7 +36,7 @@ var serial_time=0.5;//シリアル通信時間
 const min_radius = 50; 　　//半径の範囲
 const max_radius = 10000;　//半径の範囲
 
-const raspi=1; //0:クラウドモード, 1:ラズパイローカルモード
+const raspi=0; //0:クラウドモード, 1:ラズパイローカルモード
 
 //////////////////////////////////////////
 
@@ -85,7 +87,8 @@ var powdergo=0;
 var powderstop=0;
 var screen_mode=1;
 var content="";
-
+var instance;
+var instance2;
 //信号を送るかの設定はここ使って
 function fetch2(text){
         log.log(text);
@@ -98,18 +101,11 @@ class Scratch3NewBlocks {
         this.runtime = runtime;
         
         this._counter = 0;
-
+        instance = new Scratch3LooksBlocks(runtime);
+        instance2 = new Scratch3PenBlocks(runtime);
         //this.runtime.on('RUNTIME_DISPOSED', this.clearCounter.bind(this));
 
-        this._penDrawableId = -1;
-        this._penSkinId = -1;
 
-        this._onTargetCreated = this._onTargetCreated.bind(this);
-        this._onTargetMoved = this._onTargetMoved.bind(this);
-
-        runtime.on('targetWasCreated', this._onTargetCreated);
-        runtime.on('RUNTIME_DISPOSED', this.clear.bind(this));
-        
         this.runtime.on('KEY_PRESSED', key => {
             this.runtime.startHats('event_whenkeypressed', {
                 KEY_OPTION: key
@@ -124,78 +120,6 @@ class Scratch3NewBlocks {
         this.downloadLink.setAttribute('download', 'savedata.txt');
     }
     
-    static get DEFAULT_PEN_STATE () {
-        return{
-            penDown: false,
-            color: 0.0,
-            saturation: 0,
-            brightness: 100,
-            transparency: 0,
-            _shade: 50, 
-            penAttributes: {
-                color4f: [1, 1, 1 ,1],
-                diameter: 5
-            }
-        };
-    }
-    
-    static get PEN_SIZE_RANGE () {
-    return {min: 1, max: 1200};
-    }
-
-    static get STATE_KEY () {
-        return 'Scratch.newblocks';
-    }
-    
-    _clamppenSize (requestedSize) {
-    return MathUtil.clamp(
-            requestedSize,
-            Scratch3NewBlocks.pen_SIZE_RANGE.min,
-            Scratch3NewBlocks.pen_SIZE_RANGE.max
-        );
-    }
-
-    _getPenLayerID () {
-        if (this._penSkinId < 0 && this.runtime.renderer) {
-            this._penSkinId = this.runtime.renderer.createPenSkin();
-            this._penDrawableId = this.runtime.renderer.createDrawable(StageLayering.PEN_LAYER);
-            this.runtime.renderer.updateDrawableSkinId(this._penDrawableId, this._penSkinId);
-        }
-        return this._penSkinId;
-    }
-    
-    _getPenState (target) {
-        let penState = target.getCustomState(Scratch3NewBlocks.STATE_KEY);
-        if (!penState) {
-            penState = Clone.simple(Scratch3NewBlocks.DEFAULT_PEN_STATE);
-            target.setCustomState(Scratch3NewBlocks.STATE_KEY, penState);
-        }
-        return penState;
-    }
-    
-    _onTargetMoved (target, oldX, oldY, isForce) {
-        // Only move the pen if the movement isn't forced (ie. dragged).
-        if (!isForce) {
-            const penSkinId = this._getPenLayerID();
-            if (penSkinId >= 0) {
-                const penState = this._getPenState(target);
-                this.runtime.renderer.penLine(penSkinId, penState.penAttributes, oldX, oldY, target.x, target.y);
-                this.runtime.requestRedraw();
-            }
-        }
-    }
-    
-    _onTargetCreated (newTarget, sourceTarget) {
-        if (sourceTarget) {
-            const penState = sourceTarget.getCustomState(Scratch3NewBlocks.STATE_KEY);
-            if (penState) {
-                newTarget.setCustomState(Scratch3NewBlocks.STATE_KEY, Clone.simple(penState));
-                if (penState.penDown) {
-                    newTarget.addListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
-                }
-            }
-        }
-    }
     
     getPrimitives(){
         return{
@@ -247,58 +171,8 @@ class Scratch3NewBlocks {
     }
 
 
- _initColorParam () {
-   return [
-             {   
-                text: formatMessage({
-                    id: 'pen.colorMenu.color',
-                    default: 'color',
-                    description: 'label for color element in color picker for pen extension'
-                }),
-                value: ColorParam.COLOR
-            },
-            {
-                text: formatMessage({
-                    id: 'pen.colorMenu.saturation',
-                    default: 'saturation',
-                    description: 'label for saturation element in color picker for pen extension'
-                }),
-                value: ColorParam.SATURATION
-            },
-            {
-                text: formatMessage({
-                    id: 'pen.colorMenu.brightness',
-                    default: 'brightness',
-                    description: 'label for brightness element in color picker for pen extension'
-                }),
-                value: ColorParam.BRIGHTNESS
-            },
-            {
-                text: formatMessage({
-                    id: 'pen.colorMenu.transparency',
-                    default: 'transparency',
-                    description: 'label for transparency element in color picker for pen extension'
-                }),
-                value: ColorParam.TRANSPARENCY
-            }
-
-        ];
-    }
-    _wrapColor (value) {
-        return MathUtil.wrapClamp(value, 0, 100);
-    }
-    
-    _clampColorParam (value) {
-        return MathUtil.clamp(value, 0, 100);
-    }
-    _alphaToTransparency (alpha) {
-        return (1.0 - alpha) * 100.0;
-    }
-
-    _transparencyToAlpha (transparency) {
-        return 1.0 - (transparency / 100.0);
-    }
-    
+ 
+        
     getMonitored () {
         return {
             motion_xposition: {
@@ -517,6 +391,7 @@ class Scratch3NewBlocks {
                    }
 
                },
+               
                /*
                {
                 opcode: 'writeFile',
@@ -597,6 +472,9 @@ class Scratch3NewBlocks {
             const text=server+inst;
             if(raspi==1) fetch2(text);
             content=content+text+'\n';
+            
+            instance.sayforsecs({mutation: undefined, MESSAGE: '命令セット完了',SECS: '2'},util);
+
         }
         else{
             log.log("停止")
@@ -684,30 +562,17 @@ class Scratch3NewBlocks {
          else{
              if(menu_4[Cast.toString(args.TEXT)] == 1)//出す
              {
-                 const target = util.target;
-                 const penState = this._getPenState(target);         
-                 if (!penState.penDown) 
-                 {
-                     penState.penDown = true;
-                     target.addListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
-                 }
-                 const penSkinId = this._getPenLayerID();
-                 if (penSkinId >= 0) 
-                 {
-                     this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, target.x, target.y);
-                     this.runtime.requestRedraw();
-                 }
+
+                instance2. setPenSizeTo({mutation: undefined, SIZE: '5'}, util);
+                instance2.setPenColorParamTo ({mutation: undefined, COLOR_PARAM: 'color', VALUE: '0'}, util);
+                instance2.setPenColorParamTo ({mutation: undefined, COLOR_PARAM: 'saturation', VALUE: '0'}, util);
+                instance2.setPenColorParamTo ({mutation: undefined, COLOR_PARAM: 'brightness', VALUE: '100'}, util);
+                instance2.penDown (args, util);
+
              }
              else //出さない
              {
-                 const target = util.target;
-                 const penState = this._getPenState(target);
-                 
-                 if (penState.penDown) 
-                 {
-                     penState.penDown = false;
-                     target.removeListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
-                 }
+                instance2.penUp (args, util)
              }
          }
          log.log("粉");
@@ -785,12 +650,8 @@ class Scratch3NewBlocks {
 
     clear () //線を消す
     {
-        const penSkinId = this._getPenLayerID();
-        if (penSkinId >= 0) 
-        {
-            this.runtime.renderer.penClear(penSkinId);
-            this.runtime.requestRedraw();
-        }
+
+        instance2.clear ()
     }
 
 fetchURL11 (args,util)
@@ -940,13 +801,16 @@ fetchURL11 (args,util)
                                 const dx = G* ((p * Math.cos((Math.PI * (util.target.direction) ) / 180).toFixed(10)) * -1 );　//移動量X
                                 const dy = G * (p * Math.sin((Math.PI * (util.target.direction) ) / 180).toFixed(10));　//移動量Y
                                 util.target.setXY(circleX + dx , circleY + dy);
+                                log.log("円:",circleX+dx,circleY+dy);
                             }
                         }
                         util.yield();
                     }
                     else 
                     {
+                        
                         // Finished: move to final position.
+                        log.log("時間3:",timeElapsed,util.stackFrame.duration * (1000/fast_forward));
                         log.log("円3:",util.stackFrame.enddX,util.stackFrame.enddY,util.stackFrame.enddR);
                         log.log("円3:",circleX,circleY);
                         util.target.setXY(circleX+ util.stackFrame.enddX, circleY+ util.stackFrame.enddY);
