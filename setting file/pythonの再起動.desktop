@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/scratch2.sh
+Icon=/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/newblocks.png
+Name[ja_JP]=pythonの再起動.desktop
