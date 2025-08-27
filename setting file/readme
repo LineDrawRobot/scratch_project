@@ -28,3 +28,17 @@
 　・scratch.desktop
 
   ３．scratch.desktopをダブルクリック→実行で一定時間後にブラウザが立ち上がりプログラミングができる
+
+〇　pythonサーバの誤動作対策
+　１．以下のファイルを以下のフォルダに入れる
+　・scratch2.sh
+　 /home/pi/scratch\scratch-vm\src\extensions\scratch3_newblocks/
+　
+　２．以下のファイルをデスクトップに置く
+　・pythonの再起動.desktop
+
+  ３．誤動作のpythonサーバをctrl+cで落とす
+
+　４．pythonの再起動.desktopをダブルクリック→実行でpythonサーバが再起動される
+　
+　　
