@@ -402,7 +402,7 @@ class Server_class(BaseHTTPRequestHandler):
                     elif inst['inst'][0]=='SLEEP' or inst['inst'][0]=='SLEEP_A':
                         for key in inst:
                             op[key]=inst[key][0]
-                        time.sleep(int(op['TIME']))
+                        time.sleep(float(op['TIME']))
 
             else:
                 
