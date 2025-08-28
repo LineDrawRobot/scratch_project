@@ -35,7 +35,7 @@ const max_radius = 10000;　//半径の範囲
 
 const duration = 1; //シミュレーションの行動１回の動作時間
 
-const raspi = 1; //0:クラウドモード, 1:ラズパイローカルモード
+const raspi = 0; //0:クラウドモード, 1:ラズパイローカルモード
 
 //////////////////////////////////////////
 
@@ -526,7 +526,8 @@ class Scratch3NewBlocks {
             content = content + text + '\n';
         }
         else{
-           //util.stopAll();
+           point = 1;
+           kaiten = 0;
            log.log("タイヤ停止");
         }
     }
@@ -1082,5 +1083,11 @@ class Scratch3NewBlocks {
 
 
 }
+
+
+
+
+
+
 
 module.exports = Scratch3NewBlocks;
