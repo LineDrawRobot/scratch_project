@@ -539,8 +539,8 @@ class Scratch3NewBlocks {
             const inst= "inst=TIREOFF";
             const text1 = "&SPEED=STOP";
             const text = server+inst+text1;
+            if(raspi==1) fetch2(text);
             content=content+text+'\n';
-            //fetch2(text);
         }
         else{
            //util.stopAll();
