@@ -36,7 +36,7 @@ var serial_time=0.5;//シリアル通信時間
 const min_radius = 50; 　　//半径の範囲
 const max_radius = 10000;　//半径の範囲
 
-const raspi=0; //0:クラウドモード, 1:ラズパイローカルモード
+const raspi=1; //0:クラウドモード, 1:ラズパイローカルモード
 
 //////////////////////////////////////////
 
@@ -229,12 +229,12 @@ class Scratch3NewBlocks {
                             menu:"MENU3"
                         }
                     }
-                },/*
+                },
                 {
                     opcode: 'fetchURL4',
                     blockType: BlockType.COMMAND,
                     text: 'タイヤを止める',
-                },*/
+                },
                 {
                     opcode:'fetchURL5',
                     blockType:BlockType.COMMAND,
@@ -531,7 +531,7 @@ class Scratch3NewBlocks {
         }
         log.log("前後移動");
     }
-    /*
+    
     fetchURL4(args,util) //動作の停止
     {
         if ( mode == 1 ){
@@ -546,7 +546,7 @@ class Scratch3NewBlocks {
            //util.stopAll();
            log.log("タイヤ停止");
         }
-    }*/
+    }
     
    fetchURL5(args,util)//粉
     {
