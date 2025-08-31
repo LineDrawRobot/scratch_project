@@ -160,7 +160,7 @@ class Server_class(BaseHTTPRequestHandler):
                             op[key]=inst[key][0]
                         print(op)
                             
-                        for i in range(2,8):
+                        for i in range(1,8):
                             led_pin[i].off()
                             time.sleep(timer1)
                             
