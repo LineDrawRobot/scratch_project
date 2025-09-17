@@ -86,6 +86,7 @@ var powderstop = 0;
 var screen_mode = 1;
 var content = "";
 var looks, pen, motion;
+var previous_order = "";
 
 //信号を送るかの設定はここ使って
 function fetch2(text) {
@@ -432,14 +433,14 @@ class Scratch3NewBlocks {
 
     fetchURL1(args, util)//全体起動
     {
-        const server = "http://localhost:8000?";
-        const inst = "inst_n=" + (inst_n++) + "&inst=START";
+        const server = "http://localhost:8000?"+ "inst_n=" + (inst_n++);
+        const inst = "&inst=START";
         if (menu_6[Cast.toString(args.TEXT)] == 1) {
             const text = server + inst;
             mode = menu_6[Cast.toString(args.TEXT)];
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
-
+            previous_order = inst;
         }
         else {
             const text = "start";
@@ -451,12 +452,12 @@ class Scratch3NewBlocks {
     fetchURL2(args, util)//全体停止
     {
         if (mode == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=STOP";
+            const server = "http://localhost:8000?"+ "inst_n=" + (inst_n++);
+            const inst =  "&inst=STOP";
             const text = server + inst;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
-
+            previous_order = inst;
             looks.sayforsecs({ mutation: undefined, MESSAGE: '命令セット完了', SECS: '2' }, util);
 
         }
@@ -469,15 +470,17 @@ class Scratch3NewBlocks {
     fetchURL3(args, util)//移動
     {
         if (mode == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=TIREON";
+            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+            const inst = "&inst=TIREON";
             const text2 = "&ForB=" + menu_1[Cast.toString(args.TEXT2)];
             const text3 = "&SPEED=" + menu_3[Cast.toString(args.TEXT3)];
             const text = server + inst + text2 + text3;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
-            //ステアリング補正時間
-            additional_time = correction_time;
+            const current_order = inst + text2 + text3;
+            if(current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+            else additional_time = 0.0;
+            previous_order=inst + text2 + text3;       
             flag2 = 1;
         }
         else {
@@ -518,12 +521,13 @@ class Scratch3NewBlocks {
     fetchURL4(args,util) //動作の停止
     {
         if ( mode == 1 ){
-            const server = "http://localhost:8000?";
-            const inst= "inst=TIREOFF";
+            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+            const inst= "&inst=TIREOFF";
             const text1 = "&SPEED=STOP";
             const text = server+inst+text1;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
+            //previous_order=inst+text1;
         }
         else{
            point = 1;
@@ -567,14 +571,14 @@ class Scratch3NewBlocks {
     fetchURL6(args, util)//回転
     {
         if (mode == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=TURN";
+            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+            const inst =  "&inst=TURN";
             const text1 = "&CW=" + menu_5[Cast.toString(args.TEXT1)];
             const text2 = "&SPEED=" + menu_2[Cast.toString(args.TEXT2)];
             const text = server + inst + text1 + text2;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
-
+            previous_order=inst + text1 + text2;
             //ステアリング補正時間
             additional_time = correction_time;
         }
@@ -639,11 +643,11 @@ class Scratch3NewBlocks {
         pen.clear()
     }
 
-    fetchURL11(args, util) {
+    fetchURL11(args, util) {//●秒動かす
 
         if (mode == 1) {
             const server = "http://localhost:8000?";
-            if (flag == 1 && flag2 == 1) {
+            if (flag == 1 && flag2 == 1) { //flag →粉を出すか  flag2 →　直進か円軌道か
                 var inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
                 var text1 = "&TIME=" + additional_time;
                 var text = server + inst + text1;
@@ -675,6 +679,7 @@ class Scratch3NewBlocks {
                 var text = server + inst + text1;
                 if (raspi == 1) fetch2(text);
                 content = content + text + '\n';
+                flag2 = 0;
             }
 
 
@@ -956,13 +961,13 @@ class Scratch3NewBlocks {
         additional_time = 0.0;
         inst_n = 0;
         content = "instruction\n";
-        if (raspi == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=RESET";
-            const text0 = server + inst;
-            fetch2(text0);
-        }
-
+        const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+        const inst = "&inst=RESET";
+        const text = server + inst;
+        
+        if (raspi == 1)  fetch2(text);
+        
+        previous_order=inst;
 
         return {
             event_whenflagclicked: {
@@ -989,8 +994,8 @@ class Scratch3NewBlocks {
     fetchURL19(args, util)//半径指定の円軌道
     {
         if (mode == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=CIRCLE3";
+            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+            const inst = "&inst=CIRCLE3";
             const text1 = "&CW=" + menu_5[Cast.toString(args.GRID)];
             var num = Math.floor(Cast.toNumber(args.RADIUS) * 100);
 
@@ -1000,8 +1005,11 @@ class Scratch3NewBlocks {
 
             const text2 = "&turnsize=" + num;//+Cast.toNumber(args.RADIUS)*100;
             const text = server + inst + text1 + text2;
+            const current_order = inst + text1 + text2;
+            if(current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+            else additional_time = 0.0;
+            previous_order=inst + text1 + text2;
 
-            additional_time = correction_time;
             flag2 = 1;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
