@@ -3,5 +3,5 @@ xapp-???
 xorb-???
 
 
-skack-boltのインストール方法
+slack-boltのインストール方法
 pip install slack-bolt --break-system-packages
