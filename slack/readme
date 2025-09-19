@@ -1,3 +1,7 @@
 slack_passに各ロボット色に対応した以下を記述する
 xapp-???
 xorb-???
+
+
+skack-boltのインストール方法
+pip install slack-bolt --break-system-packages
