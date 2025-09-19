@@ -41,6 +41,7 @@ led_pin = {}
 inst2 = {}
 
 for i in range(n_pin):
+    led_pin[i]=LED(pin_num[i])
 
 # 'こんにちは' を含むメッセージをリッスンします
 # 指定可能なリスナーのメソッド引数の一覧は以下のモジュールドキュメントを参考にしてください：
@@ -105,8 +106,8 @@ def do_GET(path):
         print('START')
 
     elif inst['inst'][0] == 'STOP':
-        # for i in range(n_pin):
-        led_pin[i].off()
+        for i in range(n_pin):
+            led_pin[i].off()
         print('STOP')
 
     elif inst['inst'][0] == 'TIREON':
@@ -313,23 +314,22 @@ def do_GET(path):
 
         print(tx_data)
         rx_data = [0xFF, 0xFF]
-         error = 0
-          led_pin[8].on()
+        error = 0
+        led_pin[8].on()
 
-           while (tx_data != rx_data):
-
-                if (i > time_out):
-                    error = 1
-                    break
-                i += 1
-                tx_data2 = tx_data[:]
-                print(f"送信データ: {[f'{b:04X}' for b in tx_data]}")
-                time.sleep(0.1)
-                rx_data = spi.xfer2(tx_data2)  # SPI通信でデータ送信
-                time.sleep(0.1)
-                rx_data = spi.xfer2([0x00, 0x00])  # ダミーデータを送信して、受信データ確認
-                time.sleep(0.1)
-                print(f"受信データ: {[f'{b:04X}' for b in rx_data]}")
+        while (tx_data != rx_data):
+            if (i > time_out):
+                error = 1
+                break
+            i += 1
+            tx_data2 = tx_data[:]
+            print(f"送信データ: {[f'{b:04X}' for b in tx_data]}")
+            time.sleep(0.1)
+            rx_data = spi.xfer2(tx_data2)  # SPI通信でデータ送信
+            time.sleep(0.1)
+            rx_data = spi.xfer2([0x00, 0x00])  # ダミーデータを送信して、受信データ確認
+            time.sleep(0.1)
+            print(f"受信データ: {[f'{b:04X}' for b in rx_data]}")
 
             led_pin[8].off()
             spi.close()
@@ -340,17 +340,17 @@ def do_GET(path):
             else:
                 print("Value setting is complete")
 
-                if op['CW'] == '0':
-                    led_pin[4].on()
-                    led_pin[5].off()
-                    led_pin[6].on()
-                    led_pin[7].on()
+            if op['CW'] == '0':
+                led_pin[4].on()
+                led_pin[5].off()
+                led_pin[6].on()
+                led_pin[7].on()
 
-                elif op['CW'] == '1':
-                    led_pin[4].on()
-                    led_pin[5].on()
-                    led_pin[6].on()
-                    led_pin[7].off()
+            elif op['CW'] == '1':
+                led_pin[4].on()
+                led_pin[5].on()
+                led_pin[6].on()
+                led_pin[7].off()
 
     elif inst['inst'][0] == 'SLEEP' or inst['inst'][0] == 'SLEEP_A':
         print('SLEEP')
