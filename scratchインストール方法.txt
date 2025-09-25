@@ -1,0 +1,20 @@
+/*レジストリを最新にする*/
+sudo apt update -y  
+sudo apt upgrade -y
+
+/*nodejs、npm、yarnをインストール*/
+sudo apt install nodejs npm -y
+
+
+/*scratchをインストール*/
+mkdir scratch
+cd scratch
+git clone --depth 1 https://github.com/llk/scratch-vm.git
+git clone --depth 1 https://github.com/llk/scratch-gui.git
+cd scratch-vm
+npm install
+npm link
+cd ../scratch-gui
+npm install
+npm link scratch-vm
+npm start
