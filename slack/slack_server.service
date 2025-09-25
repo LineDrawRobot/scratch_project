@@ -1,0 +1,17 @@
+[Unit]
+Description=My Startup Script
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/slack_server.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=5
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
