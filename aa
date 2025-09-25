@@ -1,0 +1,19 @@
+import traceback
+import datetime
+
+try:
+    # エラーを起こす処理の例
+    1 / 0
+
+except Exception as e:
+    # 日時を取得
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # ログに書き込む内容
+    log_text = f"[{now}] {repr(e)}\n{traceback.format_exc()}\n"
+
+    # ファイルに追記モードで書き込み
+    with open("log.txt", "a", encoding="utf-8") as f:
+        f.write(log_text)
+
+    print("エラーを log.txt に書き込みました")
