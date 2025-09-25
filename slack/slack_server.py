@@ -10,8 +10,11 @@ import requests
 from gpiozero import LED
 import sys
 import spidev
+import traceback
+import datetime
 
-with open("slack_pass.txt", "r", encoding="utf-8") as f:
+
+with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/slack_pass.txt", "r", encoding="utf-8") as f:
     app_token = f.readline().strip()
     bot_token = f.readline().strip()
 
@@ -96,7 +99,7 @@ def message_hello(message, say):
 
 
 def do_GET(path):
-
+  try:
     inst = parse(path)
     for key in inst:
         op[key] = inst[key][0]
@@ -355,7 +358,18 @@ def do_GET(path):
     elif inst['inst'][0] == 'SLEEP' or inst['inst'][0] == 'SLEEP_A':
         print('SLEEP')
         time.sleep(float(op['TIME']))
+  except Exception as e:  
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # ログに書き込む内容
+    log_text = f"[{now}] {repr(e)}\n{traceback.format_exc()}\n"
+
+    # ファイルに追記モードで書き込み
+    with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/log.txt", "a", encoding="utf-8") as f:
+        f.write(log_text)
+    for i in range(n_pin):
+        led_pin[i].off()
+    os._exit(1)
 
 @app.event("message")
 def handle_message_events(body, logger):
