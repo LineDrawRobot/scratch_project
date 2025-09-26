@@ -1,4 +1,5 @@
 #!/bin/bash
+# ホームホルダー（pi)で実行する
 
 #スクラッチのインストール
 sudo apt update -y  
@@ -36,7 +37,7 @@ sudo chmod +x scratch2.sh
 curl https://raw.githubusercontent.com/LineDrawRobot/scratch_project/blob/main/setting%20file/python.desktop > ~/Desktop/python.desktop
 curl https://raw.githubusercontent.com/LineDrawRobot/scratch_project/blob/main/setting%20file/scratch.desktop > ~/Desktop/scratch.desktop
 
-cd ../extension-support
+cd ~/scratch/scratch-vm/src/extension-support
 curl https://raw.githubusercontent.com/LineDrawRobot/scratch_project/refs/heads/main/index/extension-manager.js > extension-manager.js
 
 
