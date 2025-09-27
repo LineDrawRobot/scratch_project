@@ -403,7 +403,7 @@ class Server_class(BaseHTTPRequestHandler):
                         for key in inst:
                             op[key]=inst[key][0]
                         time.sleep(float(op['TIME']))
-
+                index=0;
             else:
                 
                 inst2[index]=inst
