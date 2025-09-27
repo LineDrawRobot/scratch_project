@@ -1073,6 +1073,7 @@ class Scratch3NewBlocks {
                 body: JSON.stringify({ text: content })
             }).then(response => console.log)
                 .catch(error => alert('error!!'));
+            content="";
         }
     }
 
