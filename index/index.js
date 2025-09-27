@@ -197,6 +197,15 @@ class Scratch3NewBlocks {
             blockIconURI: blockIconURI,
             blocks: [
                 {
+                    opcode: 'fetchURL16',
+                    blockType: BlockType.HAT,
+                    text: 'プログラム開始',
+                    arguments: {
+                        defaultValue: false
+                    },
+                    isEdgeActivated: false
+                },
+                {
                     opcode: 'fetchURL1',
                     blockType: BlockType.COMMAND,
                     text: '[TEXT]を起動',
@@ -211,7 +220,7 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'fetchURL2',
                     blockType: BlockType.COMMAND,
-                    text: '停止'
+                    text: 'プログラム終了'
                 },
                 {
                     opcode: 'fetchURL3',
@@ -267,6 +276,25 @@ class Scratch3NewBlocks {
                     filter: [TargetType.SPRITE]
                 },
                 {
+
+                    opcode: 'fetchURL19',
+                    blockType: BlockType.COMMAND,
+                    text: '[GRID]に半径[RADIUS]m（範囲：' + min_radius / 100 + '~' + max_radius / 100 + '）の円軌道をさせる',
+                    arguments: {
+                        GRID: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "時計回り",
+                            menu: 'MENU5'
+
+                        },
+                        RADIUS: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "1"
+                        }
+                    }
+
+                },
+                {
                     opcode: 'fetchURL7',
                     blockType: BlockType.LOOP,
                     text: '[TIMES]回繰り返す',
@@ -278,11 +306,7 @@ class Scratch3NewBlocks {
                     },
                     isEdgeActivated: true
                 },
-                {
-                    opcode: 'clear',
-                    blockType: BlockType.COMMAND,
-                    text: 'シミュレーターの線を消す'
-                },
+                
 
                 {
                     opcode: 'fetchURL11',
@@ -315,16 +339,12 @@ class Scratch3NewBlocks {
                 },
                 */
 
+                
                 {
-                    opcode: 'fetchURL16',
-                    blockType: BlockType.HAT,
-                    text: 'プログラム開始',
-                    arguments: {
-                        defaultValue: false
-                    },
-                    isEdgeActivated: false
+                    opcode: 'clear',
+                    blockType: BlockType.COMMAND,
+                    text: 'シミュレーターの線を消す'
                 },
-
 
                 {
                     opcode: 'fetchURL18',
@@ -346,25 +366,7 @@ class Scratch3NewBlocks {
                     },
                 },
 
-                {
-
-                    opcode: 'fetchURL19',
-                    blockType: BlockType.COMMAND,
-                    text: '[GRID]に半径[RADIUS]m（範囲：' + min_radius / 100 + '~' + max_radius / 100 + '）の円軌道をさせる',
-                    arguments: {
-                        GRID: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "時計回り",
-                            menu: 'MENU5'
-
-                        },
-                        RADIUS: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: "1"
-                        }
-                    }
-
-                },
+                
                 {
                     opcode: 'fetchURL20',
                     blockType: BlockType.COMMAND,
@@ -965,7 +967,7 @@ class Scratch3NewBlocks {
         const inst = "&inst=RESET";
         const text = server + inst;
         
-        if (raspi == 1)  fetch2(text);
+        if (raspi == 1 && mode == 1)  fetch2(text);
         
         previous_order=inst;
 
