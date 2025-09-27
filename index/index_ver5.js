@@ -35,7 +35,7 @@ const max_radius = 10000;　//半径の範囲
 
 const duration = 1; //シミュレーションの行動１回の動作時間
 
-const raspi = 1; //0:クラウドモード, 1:ラズパイローカルモード
+const raspi = 0; //0:クラウドモード, 1:ラズパイローカルモード
 
 //////////////////////////////////////////
 
@@ -306,7 +306,7 @@ class Scratch3NewBlocks {
                     },
                     isEdgeActivated: true
                 },
-                
+
 
                 {
                     opcode: 'fetchURL11',
@@ -339,7 +339,7 @@ class Scratch3NewBlocks {
                 },
                 */
 
-                
+
                 {
                     opcode: 'clear',
                     blockType: BlockType.COMMAND,
@@ -366,7 +366,7 @@ class Scratch3NewBlocks {
                     },
                 },
 
-                
+
                 {
                     opcode: 'fetchURL20',
                     blockType: BlockType.COMMAND,
@@ -435,7 +435,7 @@ class Scratch3NewBlocks {
 
     fetchURL1(args, util)//全体起動
     {
-        const server = "http://localhost:8000?"+ "inst_n=" + (inst_n++);
+        const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
         const inst = "&inst=START";
         if (menu_6[Cast.toString(args.TEXT)] == 1) {
             const text = server + inst;
@@ -454,8 +454,8 @@ class Scratch3NewBlocks {
     fetchURL2(args, util)//全体停止
     {
         if (mode == 1) {
-            const server = "http://localhost:8000?"+ "inst_n=" + (inst_n++);
-            const inst =  "&inst=STOP";
+            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+            const inst = "&inst=STOP";
             const text = server + inst;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
@@ -480,9 +480,9 @@ class Scratch3NewBlocks {
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
             const current_order = inst + text2 + text3;
-            if(current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+            if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
             else additional_time = 0.0;
-            previous_order=inst + text2 + text3;       
+            previous_order = inst + text2 + text3;
             flag2 = 1;
         }
         else {
@@ -519,22 +519,22 @@ class Scratch3NewBlocks {
         }
         log.log("前後移動");
     }
-    
-    fetchURL4(args,util) //動作の停止
+
+    fetchURL4(args, util) //動作の停止
     {
-        if ( mode == 1 ){
+        if (mode == 1) {
             const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst= "&inst=TIREOFF";
+            const inst = "&inst=TIREOFF";
             const text1 = "&SPEED=STOP";
-            const text = server+inst+text1;
+            const text = server + inst + text1;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
             //previous_order=inst+text1;
         }
-        else{
-           point = 1;
-           kaiten = 0;
-           log.log("タイヤ停止");
+        else {
+            point = 1;
+            kaiten = 0;
+            log.log("タイヤ停止");
         }
     }
 
@@ -574,13 +574,13 @@ class Scratch3NewBlocks {
     {
         if (mode == 1) {
             const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst =  "&inst=TURN";
+            const inst = "&inst=TURN";
             const text1 = "&CW=" + menu_5[Cast.toString(args.TEXT1)];
             const text2 = "&SPEED=" + menu_2[Cast.toString(args.TEXT2)];
             const text = server + inst + text1 + text2;
             if (raspi == 1) fetch2(text);
             content = content + text + '\n';
-            previous_order=inst + text1 + text2;
+            previous_order = inst + text1 + text2;
             //ステアリング補正時間
             additional_time = correction_time;
         }
@@ -966,10 +966,10 @@ class Scratch3NewBlocks {
         const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
         const inst = "&inst=RESET";
         const text = server + inst;
-        
-        if (raspi == 1 && mode == 1)  fetch2(text);
-        
-        previous_order=inst;
+
+        if (raspi == 1 && mode == 1) fetch2(text);
+
+        previous_order = inst;
 
         return {
             event_whenflagclicked: {
@@ -1008,9 +1008,9 @@ class Scratch3NewBlocks {
             const text2 = "&turnsize=" + num;//+Cast.toNumber(args.RADIUS)*100;
             const text = server + inst + text1 + text2;
             const current_order = inst + text1 + text2;
-            if(current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+            if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
             else additional_time = 0.0;
-            previous_order=inst + text1 + text2;
+            previous_order = inst + text1 + text2;
 
             flag2 = 1;
             if (raspi == 1) fetch2(text);
@@ -1055,25 +1055,26 @@ class Scratch3NewBlocks {
 
 
     fetchURL21(args, util) {
+        if (mode == 1) {
+            if (raspi == 1) {
+                const server = "http://localhost:8000?";
+                const inst = "inst_n=" + (inst_n++) + "&inst=EXECUTE";
+                const text0 = server + inst;
+                fetch2(text0);
+            } else {
 
-        if (raspi == 1) {
-            const server = "http://localhost:8000?";
-            const inst = "inst_n=" + (inst_n++) + "&inst=EXECUTE";
-            const text0 = server + inst;
-            fetch2(text0);
-        } else {
-
-            const url = 'https://hooks.slack.com/services/' + args.PASS; // TODO: set WebhookURL
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json'
-                },
-                //body: JSON.stringify({ text: Cast.toString(args.WORD) })
-                body: JSON.stringify({ text: content })
-            }).then(response => console.log)
-                .catch(error => alert('error!!'));
-            content="";
+                const url = 'https://hooks.slack.com/services/' + args.PASS; // TODO: set WebhookURL
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    //body: JSON.stringify({ text: Cast.toString(args.WORD) })
+                    body: JSON.stringify({ text: content })
+                }).then(response => console.log)
+                    .catch(error => alert('error!!'));
+                content = "";
+            }
         }
     }
 
