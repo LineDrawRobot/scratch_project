@@ -962,6 +962,8 @@ class Scratch3NewBlocks {
         Q = 0;
         additional_time = 0.0;
         inst_n = 0;
+        flag = 0;
+        flag2 = 0;
         content = "instruction\n";
         const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
         const inst = "&inst=RESET";
