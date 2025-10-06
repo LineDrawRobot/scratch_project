@@ -35,13 +35,15 @@ const max_radius = 10000;　//半径の範囲
 
 const duration = 1; //シミュレーションの行動１回の動作時間
 
-const raspi = 0; //0:クラウドモード, 1:ラズパイローカルモード
+const raspi = 1; //0:クラウドモード, 1:ラズパイローカルモード
 
 //////////////////////////////////////////
+
 
 const speed1 = '低速(約' + teisoku_speed + 'cm/s)';
 const speed2 = '中速(約' + tyusoku_speed + 'cm/s)';
 const speed3 = '高速(約' + kousoku_speed + 'cm/s)';
+
 
 const rot1 = '低速(約' + teisoku_kaiten + '°/s)';
 const rot2 = '中速(約' + tyusoku_kaiten + '°/s)';
@@ -87,6 +89,7 @@ var screen_mode = 1;
 var content = "";
 var looks, pen, motion;
 var previous_order = "";
+var write_enable = 0;
 
 //信号を送るかの設定はここ使って
 function fetch2(text) {
@@ -412,7 +415,7 @@ class Scratch3NewBlocks {
                     items: [rot1/*,rot2,rot3*/]
                 },
                 MENU3: { //SPEED
-                    items: [speed1, speed2, speed3]
+                    items: [speed1/*, speed2, speed3*/]
                 },
                 MENU4: { //INOUT
                     items: ['出す', '出さない']
@@ -435,188 +438,203 @@ class Scratch3NewBlocks {
 
     fetchURL1(args, util)//全体起動
     {
-        const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-        const inst = "&inst=START";
-        if (menu_6[Cast.toString(args.TEXT)] == 1) {
-            const text = server + inst;
-            mode = menu_6[Cast.toString(args.TEXT)];
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-            previous_order = inst;
-        }
-        else {
-            const text = "start";
-            mode = menu_6[Cast.toString(args.TEXT)];
-            log.log("起動");
+        if (write_enable == 1) {
+
+            if (menu_6[Cast.toString(args.TEXT)] == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=START";
+                const text = server + inst;
+                mode = menu_6[Cast.toString(args.TEXT)];
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                previous_order = inst;
+            }
+            else {
+                const text = "start";
+                mode = menu_6[Cast.toString(args.TEXT)];
+                looks.say({ mutation: undefined, MESSAGE: '' }, util);
+                log.log("起動");
+            }
         }
     }
 
     fetchURL2(args, util)//全体停止
     {
-        if (mode == 1) {
-            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst = "&inst=STOP";
-            const text = server + inst;
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-            previous_order = inst;
-            looks.sayforsecs({ mutation: undefined, MESSAGE: '命令セット完了', SECS: '2' }, util);
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=STOP";
+                const text = server + inst;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                previous_order = inst;
+                looks.say({ mutation: undefined, MESSAGE: '命令セット完了' }, util);
+            }
+            else {
+                log.log("停止")
+                util.stopAll();
 
-        }
-        else {
-            log.log("停止")
-            util.stopAll();
+            }
+            write_enable = 2;
         }
     }
 
     fetchURL3(args, util)//移動
     {
-        if (mode == 1) {
-            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst = "&inst=TIREON";
-            const text2 = "&ForB=" + menu_1[Cast.toString(args.TEXT2)];
-            const text3 = "&SPEED=" + menu_3[Cast.toString(args.TEXT3)];
-            const text = server + inst + text2 + text3;
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-            const current_order = inst + text2 + text3;
-            if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
-            else additional_time = 0.0;
-            previous_order = inst + text2 + text3;
-            flag2 = 1;
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=TIREON";
+                const text2 = "&ForB=" + menu_1[Cast.toString(args.TEXT2)];
+                const text3 = "&SPEED=" + menu_3[Cast.toString(args.TEXT3)];
+                const text = server + inst + text2 + text3;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                const current_order = inst + text2 + text3;
+                if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+                else additional_time = 0.0;
+                previous_order = inst + text2 + text3;
+                flag2 = 1;
+            }
+            else {
+                const radians = MathUtil.degToRad(90 - util.target.direction);
+                point = 0;
+                if (menu_3[Cast.toString(args.TEXT3)] == 1) //低速
+                {
+                    dx = teisoku_speed * Math.cos(radians) / screen_mode;
+                    dy = teisoku_speed * Math.sin(radians) / screen_mode;;
+                }
+                else if (menu_3[Cast.toString(args.TEXT3)] == 2) //中速
+                {
+                    dx = tyusoku_speed * Math.cos(radians) / screen_mode;;
+                    dy = tyusoku_speed * Math.sin(radians) / screen_mode;;
+                }
+                else//                            //高速
+                {
+                    dx = kousoku_speed * Math.cos(radians) / screen_mode;;
+                    dy = kousoku_speed * Math.sin(radians) / screen_mode;;
+                }
+
+                //log.log('dx','dy',dx,dy);
+
+                if (menu_1[Cast.toString(args.TEXT2)] == 0)//前
+                {
+                    jisokuX = dx;
+                    jisokuY = dy;
+                }
+
+                else if (menu_1[Cast.toString(args.TEXT2)] == 1) {
+                    jisokuX = -dx;
+                    jisokuY = -dy;
+                }
+            }
+            log.log("前後移動");
         }
-        else {
-            const radians = MathUtil.degToRad(90 - util.target.direction);
-            point = 0;
-            if (menu_3[Cast.toString(args.TEXT3)] == 1) //低速
-            {
-                dx = teisoku_speed * Math.cos(radians) / screen_mode;
-                dy = teisoku_speed * Math.sin(radians) / screen_mode;;
-            }
-            else if (menu_3[Cast.toString(args.TEXT3)] == 2) //中速
-            {
-                dx = tyusoku_speed * Math.cos(radians) / screen_mode;;
-                dy = tyusoku_speed * Math.sin(radians) / screen_mode;;
-            }
-            else//                            //高速
-            {
-                dx = kousoku_speed * Math.cos(radians) / screen_mode;;
-                dy = kousoku_speed * Math.sin(radians) / screen_mode;;
-            }
-
-            //log.log('dx','dy',dx,dy);
-
-            if (menu_1[Cast.toString(args.TEXT2)] == 0)//前
-            {
-                jisokuX = dx;
-                jisokuY = dy;
-            }
-
-            else if (menu_1[Cast.toString(args.TEXT2)] == 1) {
-                jisokuX = -dx;
-                jisokuY = -dy;
-            }
-        }
-        log.log("前後移動");
     }
 
     fetchURL4(args, util) //動作の停止
     {
-        if (mode == 1) {
-            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst = "&inst=TIREOFF";
-            const text1 = "&SPEED=STOP";
-            const text = server + inst + text1;
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-            //previous_order=inst+text1;
-        }
-        else {
-            point = 1;
-            kaiten = 0;
-            log.log("タイヤ停止");
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=TIREOFF";
+                const text1 = "&SPEED=STOP";
+                const text = server + inst + text1;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                //previous_order=inst+text1;
+            }
+            else {
+                point = 1;
+                kaiten = 0;
+                log.log("タイヤ停止");
+            }
         }
     }
 
     fetchURL5(args, util)//粉
     {
-        if (mode == 1) {
+        if (write_enable == 1) {
+            if (mode == 1) {
 
-            if (menu_4[Cast.toString(args.TEXT)] == 1) {
-                flag = 1;
+                if (menu_4[Cast.toString(args.TEXT)] == 1) {
+                    flag = 1;
+                }
+                else {
+                    flag = 0;
+
+                }
             }
             else {
-                flag = 0;
+                if (menu_4[Cast.toString(args.TEXT)] == 1)//出す
+                {
 
+                    pen.setPenSizeTo({ mutation: undefined, SIZE: '5' }, util);
+                    pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'color', VALUE: '0' }, util);
+                    pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'saturation', VALUE: '0' }, util);
+                    pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'brightness', VALUE: '100' }, util);
+                    pen.penDown(args, util);
+
+                }
+                else //出さない
+                {
+                    pen.penUp(args, util)
+                }
             }
+            log.log("粉");
         }
-        else {
-            if (menu_4[Cast.toString(args.TEXT)] == 1)//出す
-            {
-
-                pen.setPenSizeTo({ mutation: undefined, SIZE: '5' }, util);
-                pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'color', VALUE: '0' }, util);
-                pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'saturation', VALUE: '0' }, util);
-                pen.setPenColorParamTo({ mutation: undefined, COLOR_PARAM: 'brightness', VALUE: '100' }, util);
-                pen.penDown(args, util);
-
-            }
-            else //出さない
-            {
-                pen.penUp(args, util)
-            }
-        }
-        log.log("粉");
     }
 
 
     fetchURL6(args, util)//回転
     {
-        if (mode == 1) {
-            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst = "&inst=TURN";
-            const text1 = "&CW=" + menu_5[Cast.toString(args.TEXT1)];
-            const text2 = "&SPEED=" + menu_2[Cast.toString(args.TEXT2)];
-            const text = server + inst + text1 + text2;
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-            previous_order = inst + text1 + text2;
-            //ステアリング補正時間
-            additional_time = correction_time;
-        }
-
-        else {
-
-            point = 1;
-            if (menu_2[Cast.toString(args.TEXT2)] == 1)//低速
-            {
-                const W = Cast.toNumber(teisoku_speed * 2 / d);
-                degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
-                degrees = teisoku_kaiten;
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=TURN";
+                const text1 = "&CW=" + menu_5[Cast.toString(args.TEXT1)];
+                const text2 = "&SPEED=" + menu_2[Cast.toString(args.TEXT2)];
+                const text = server + inst + text1 + text2;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                previous_order = inst + text1 + text2;
+                //ステアリング補正時間
+                additional_time = correction_time;
             }
-            else if (menu_2[Cast.toString(args.TEXT2)] == 2)//中速
-            {
-                const W = Cast.toNumber(tyusoku_speed * 2 / d);
-                degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
-                degrees = tyusoku_kaiten;
-            }
+
             else {
-                const W = Cast.toNumber(kousoku_speed * 2 / d);//高速
-                degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
-                degrees = kousoku_kaiten;
-            }
 
-            if (menu_5[Cast.toString(args.TEXT1)] == 0)//時計回り
-            {
+                point = 1;
+                if (menu_2[Cast.toString(args.TEXT2)] == 1)//低速
+                {
+                    const W = Cast.toNumber(teisoku_speed * 2 / d);
+                    degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
+                    degrees = teisoku_kaiten;
+                }
+                else if (menu_2[Cast.toString(args.TEXT2)] == 2)//中速
+                {
+                    const W = Cast.toNumber(tyusoku_speed * 2 / d);
+                    degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
+                    degrees = tyusoku_kaiten;
+                }
+                else {
+                    const W = Cast.toNumber(kousoku_speed * 2 / d);//高速
+                    degrees = Math.abs(((180 * (W) / (Math.PI))).toFixed());
+                    degrees = kousoku_kaiten;
+                }
 
-                kaiten = degrees;
-                log.log('degrees', degrees);
-            }
+                if (menu_5[Cast.toString(args.TEXT1)] == 0)//時計回り
+                {
 
-            else //if(menu_5[Cast.toString(args.TEXT1)] == 1)//反時計回り
-            {
-                kaiten = -degrees;
-                log.log('degrees', degrees);
+                    kaiten = degrees;
+                    log.log('degrees', degrees);
+                }
+
+                else //if(menu_5[Cast.toString(args.TEXT1)] == 1)//反時計回り
+                {
+                    kaiten = -degrees;
+                    log.log('degrees', degrees);
+                }
             }
         }
     }
@@ -646,164 +664,164 @@ class Scratch3NewBlocks {
     }
 
     fetchURL11(args, util) {//●秒動かす
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?";
+                if (flag == 1 && flag2 == 1) { //flag →粉を出すか  flag2 →　直進か円軌道か
+                    var inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
+                    var text1 = "&TIME=" + additional_time;
+                    var text = server + inst + text1;
+                    if (raspi == 1) fetch2(text);
+                    content = content + text + '\n';
 
-        if (mode == 1) {
-            const server = "http://localhost:8000?";
-            if (flag == 1 && flag2 == 1) { //flag →粉を出すか  flag2 →　直進か円軌道か
-                var inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
-                var text1 = "&TIME=" + additional_time;
-                var text = server + inst + text1;
-                if (raspi == 1) fetch2(text);
-                content = content + text + '\n';
+                    inst = "inst_n=" + (inst_n++) + "&inst=POWDER";//大文字
+                    text1 = "&INOUT=" + 1;
+                    text = server + inst + text1;
+                    if (raspi == 1) fetch2(text);
+                    content = content + text + '\n';
 
-                inst = "inst_n=" + (inst_n++) + "&inst=POWDER";//大文字
-                text1 = "&INOUT=" + 1;
-                text = server + inst + text1;
-                if (raspi == 1) fetch2(text);
-                content = content + text + '\n';
+                    inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
+                    text1 = "&TIME=" + Cast.toNumber(args.EXECUTE);
+                    text = server + inst + text1;
+                    if (raspi == 1) fetch2(text);
+                    content = content + text + '\n';
 
-                inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
-                text1 = "&TIME=" + Cast.toNumber(args.EXECUTE);
-                text = server + inst + text1;
-                if (raspi == 1) fetch2(text);
-                content = content + text + '\n';
+                    flag2 = 0;
+                    inst = "inst_n=" + (inst_n++) + "&inst=POWDER";//大文字
+                    text1 = "&INOUT=" + 0;
+                    text = server + inst + text1;
+                    if (raspi == 1) fetch2(text);
+                    content = content + text + '\n';
+                    additional_time = 0.0;
+                } else {
+                    var inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
+                    var text1 = "&TIME=" + (additional_time + Cast.toNumber(args.EXECUTE));
+                    var text = server + inst + text1;
+                    if (raspi == 1) fetch2(text);
+                    content = content + text + '\n';
+                    flag2 = 0;
+                }
 
-                flag2 = 0;
-                inst = "inst_n=" + (inst_n++) + "&inst=POWDER";//大文字
-                text1 = "&INOUT=" + 0;
-                text = server + inst + text1;
-                if (raspi == 1) fetch2(text);
-                content = content + text + '\n';
-                additional_time = 0.0;
-            } else {
-                var inst = "inst_n=" + (inst_n++) + "&inst=SLEEP";
-                var text1 = "&TIME=" + (additional_time + Cast.toNumber(args.EXECUTE));
-                var text = server + inst + text1;
-                if (raspi == 1) fetch2(text);
-                content = content + text + '\n';
-                flag2 = 0;
+
             }
+            else {
+                //if (util.stackFrame.timer) { //新たにタイマーを動かしたとき        
+                //  var timeElapsed = util.stackFrame.timer.timeElapsed(); //新たなタイマーを動かしてからの経過時間
 
+                switch (point) {
+                    case 0:
+                        if (util.stackFrame.timer) {
+                            const timeElapsed = util.stackFrame.timer.timeElapsed();
+                            if (timeElapsed < util.stackFrame.duration * 1000) {
 
-        }
-        else {
-            //if (util.stackFrame.timer) { //新たにタイマーを動かしたとき        
-            //  var timeElapsed = util.stackFrame.timer.timeElapsed(); //新たなタイマーを動かしてからの経過時間
-
-            switch (point) {
-                case 0:
-                    if (util.stackFrame.timer) {
-                        const timeElapsed = util.stackFrame.timer.timeElapsed();
-                        if (timeElapsed < util.stackFrame.duration * 1000) {
-
-                            const frac = timeElapsed / (util.stackFrame.duration * 1000);
-                            const dx = frac * (util.stackFrame.endX);
-                            const dy = frac * (util.stackFrame.endY);
-                            util.target.setXY(
-                                util.stackFrame.startX + dx,
-                                util.stackFrame.startY + dy
-                            );
-                            util.yield();
-                        }
-                        else {
-                            // 最後の移動
-                            util.target.setXY(util.stackFrame.startX + util.stackFrame.endX, util.stackFrame.startY + util.stackFrame.endY);
-                        }
-                    } else {
-                        util.stackFrame.timer = new Timer();
-                        util.stackFrame.timer.start();
-                        util.stackFrame.duration = duration;
-                        util.stackFrame.startX = util.target.x;
-                        util.stackFrame.startY = util.target.y;
-                        util.stackFrame.endX = Cast.toNumber(args.EXECUTE) * jisokuX;
-                        util.stackFrame.endY = Cast.toNumber(args.EXECUTE) * jisokuY;
-                        if (util.stackFrame.duration <= 0) {
-                            // 動作時間が0秒の場合
-                            log.log("動作時間が不正です")
-                            return;
-                        }
-                        util.yield();
-                    }
-                    break;
-                case 1:
-                    if (util.stackFrame.timer) {
-                        const timeElapsed = util.stackFrame.timer.timeElapsed();
-                        if (timeElapsed < util.stackFrame.duration * 1000) {
-                            const frac = timeElapsed / (util.stackFrame.duration * 1000);
-                            const dr = frac * util.stackFrame.endR;
-                            util.target.setDirection(util.stackFrame.startR + dr);
-                            util.yield();
+                                const frac = timeElapsed / (util.stackFrame.duration * 1000);
+                                const dx = frac * (util.stackFrame.endX);
+                                const dy = frac * (util.stackFrame.endY);
+                                util.target.setXY(
+                                    util.stackFrame.startX + dx,
+                                    util.stackFrame.startY + dy
+                                );
+                                util.yield();
+                            }
+                            else {
+                                // 最後の移動
+                                util.target.setXY(util.stackFrame.startX + util.stackFrame.endX, util.stackFrame.startY + util.stackFrame.endY);
+                            }
                         } else {
-                            // 最後の回転
-                            util.target.setDirection(util.stackFrame.startR + util.stackFrame.endR);
-
-                        }
-                    } else {
-                        util.stackFrame.timer = new Timer();
-                        util.stackFrame.timer.start();
-                        util.stackFrame.duration = duration;
-                        util.stackFrame.startR = util.target.direction;
-                        util.stackFrame.endR = Cast.toNumber(args.EXECUTE) * kaiten;
-
-                        if (util.stackFrame.duration <= 0) {
-                            // 動作時間が0秒の場合
-                            log.log("動作時間が不正です")
-                            return;
-                        }
-                        util.yield();
-                    }
-                    break;
-
-
-                case 2:
-
-                    if (util.stackFrame.timer) {
-                        const timeElapsed = util.stackFrame.timer.timeElapsed();
-                        if (timeElapsed < util.stackFrame.duration * 1000) {
-                            const frac = timeElapsed / (util.stackFrame.duration * 1000);
-
-                            const t_m = (util.stackFrame.endR) * frac;
-                            util.target.setDirection(util.stackFrame.startR + t_m);
-                            const tmp_r = util.stackFrame.startR + t_m;
-                            const dx = G * ((p * Math.cos((Math.PI * (tmp_r)) / 180)) * -1);　//移動量X
-                            const dy = G * (p * Math.sin((Math.PI * (tmp_r)) / 180));　//移動量Y
-                            util.target.setXY(circleX + dx, circleY + dy);
+                            util.stackFrame.timer = new Timer();
+                            util.stackFrame.timer.start();
+                            util.stackFrame.duration = duration;
+                            util.stackFrame.startX = util.target.x;
+                            util.stackFrame.startY = util.target.y;
+                            util.stackFrame.endX = Cast.toNumber(args.EXECUTE) * jisokuX;
+                            util.stackFrame.endY = Cast.toNumber(args.EXECUTE) * jisokuY;
+                            if (util.stackFrame.duration <= 0) {
+                                // 動作時間が0秒の場合
+                                log.log("動作時間が不正です")
+                                return;
+                            }
                             util.yield();
                         }
+                        break;
+                    case 1:
+                        if (util.stackFrame.timer) {
+                            const timeElapsed = util.stackFrame.timer.timeElapsed();
+                            if (timeElapsed < util.stackFrame.duration * 1000) {
+                                const frac = timeElapsed / (util.stackFrame.duration * 1000);
+                                const dr = frac * util.stackFrame.endR;
+                                util.target.setDirection(util.stackFrame.startR + dr);
+                                util.yield();
+                            } else {
+                                // 最後の回転
+                                util.target.setDirection(util.stackFrame.startR + util.stackFrame.endR);
+
+                            }
+                        } else {
+                            util.stackFrame.timer = new Timer();
+                            util.stackFrame.timer.start();
+                            util.stackFrame.duration = duration;
+                            util.stackFrame.startR = util.target.direction;
+                            util.stackFrame.endR = Cast.toNumber(args.EXECUTE) * kaiten;
+
+                            if (util.stackFrame.duration <= 0) {
+                                // 動作時間が0秒の場合
+                                log.log("動作時間が不正です")
+                                return;
+                            }
+                            util.yield();
+                        }
+                        break;
+
+
+                    case 2:
+
+                        if (util.stackFrame.timer) {
+                            const timeElapsed = util.stackFrame.timer.timeElapsed();
+                            if (timeElapsed < util.stackFrame.duration * 1000) {
+                                const frac = timeElapsed / (util.stackFrame.duration * 1000);
+
+                                const t_m = (util.stackFrame.endR) * frac;
+                                util.target.setDirection(util.stackFrame.startR + t_m);
+                                const tmp_r = util.stackFrame.startR + t_m;
+                                const dx = G * ((p * Math.cos((Math.PI * (tmp_r)) / 180)) * -1);　//移動量X
+                                const dy = G * (p * Math.sin((Math.PI * (tmp_r)) / 180));　//移動量Y
+                                util.target.setXY(circleX + dx, circleY + dy);
+                                util.yield();
+                            }
+                            else {
+                                // 最後の移動
+                                util.target.setXY(circleX + util.stackFrame.endX, circleY + util.stackFrame.endY);
+                                util.target.setDirection(util.stackFrame.startR + util.stackFrame.endR);
+
+                                point = 0;
+
+                            }
+                        }
                         else {
-                            // 最後の移動
-                            util.target.setXY(circleX + util.stackFrame.endX, circleY + util.stackFrame.endY);
-                            util.target.setDirection(util.stackFrame.startR + util.stackFrame.endR);
-
-                            point = 0;
-
+                            // First time: save data for future use.
+                            util.stackFrame.timer = new Timer();
+                            util.stackFrame.timer.start();
+                            util.stackFrame.duration = duration;
+                            util.stackFrame.startX = util.target.x;
+                            util.stackFrame.startY = util.target.y;
+                            util.stackFrame.startR = util.target.direction;
+                            const Grid = util.stackFrame.startR + (Cast.toNumber(args.EXECUTE) * grid) * G;
+                            util.stackFrame.endX = G * ((p * Math.cos((Math.PI * (Grid)) / 180)) * -1);
+                            util.stackFrame.endY = G * (p * Math.sin((Math.PI * (Grid)) / 180));
+                            util.stackFrame.endR = (Cast.toNumber(args.EXECUTE) * grid) * G;
+                            if (util.stackFrame.duration <= 0) {
+                                // 動作時間が0秒の場合
+                                log.log("動作時間が不正です")
+                                return;
+                            }
+                            util.yield();
                         }
-                    }
-                    else {
-                        // First time: save data for future use.
-                        util.stackFrame.timer = new Timer();
-                        util.stackFrame.timer.start();
-                        util.stackFrame.duration = duration;
-                        util.stackFrame.startX = util.target.x;
-                        util.stackFrame.startY = util.target.y;
-                        util.stackFrame.startR = util.target.direction;
-                        const Grid = util.stackFrame.startR + (Cast.toNumber(args.EXECUTE) * grid) * G;
-                        util.stackFrame.endX = G * ((p * Math.cos((Math.PI * (Grid)) / 180)) * -1);
-                        util.stackFrame.endY = G * (p * Math.sin((Math.PI * (Grid)) / 180));
-                        util.stackFrame.endR = (Cast.toNumber(args.EXECUTE) * grid) * G;
-                        if (util.stackFrame.duration <= 0) {
-                            // 動作時間が0秒の場合
-                            log.log("動作時間が不正です")
-                            return;
-                        }
-                        util.yield();
-                    }
 
-                    break;
+                        break;
 
+                }
             }
         }
-
     }
 
 
@@ -945,7 +963,7 @@ class Scratch3NewBlocks {
             }
         }
     **/
-    fetchURL16() {
+    fetchURL16(args, util) {
         mode = 0;
         dx = 0;
         dy = 0;
@@ -964,15 +982,15 @@ class Scratch3NewBlocks {
         inst_n = 0;
         flag = 0;
         flag2 = 0;
+        write_enable = 1;
         content = "instruction\n";
         const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
         const inst = "&inst=RESET";
         const text = server + inst;
-
         if (raspi == 1 && mode == 1) fetch2(text);
 
         previous_order = inst;
-
+        looks.say({ mutation: undefined, MESSAGE: '' }, util);
         return {
             event_whenflagclicked: {
                 restartExistingThreads: true
@@ -997,47 +1015,49 @@ class Scratch3NewBlocks {
 
     fetchURL19(args, util)//半径指定の円軌道
     {
-        if (mode == 1) {
-            const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
-            const inst = "&inst=CIRCLE3";
-            const text1 = "&CW=" + menu_5[Cast.toString(args.GRID)];
-            var num = Math.floor(Cast.toNumber(args.RADIUS) * 100);
+        if (write_enable == 1) {
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=CIRCLE3";
+                const text1 = "&CW=" + menu_5[Cast.toString(args.GRID)];
+                var num = Math.floor(Cast.toNumber(args.RADIUS) * 100);
 
-            if (num < min_radius) num = min_radius;
-            else if (num > max_radius) num = max_radius;
-            else num = num;
+                if (num < min_radius) num = min_radius;
+                else if (num > max_radius) num = max_radius;
+                else num = num;
 
-            const text2 = "&turnsize=" + num;//+Cast.toNumber(args.RADIUS)*100;
-            const text = server + inst + text1 + text2;
-            const current_order = inst + text1 + text2;
-            if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
-            else additional_time = 0.0;
-            previous_order = inst + text1 + text2;
+                const text2 = "&turnsize=" + num;//+Cast.toNumber(args.RADIUS)*100;
+                const text = server + inst + text1 + text2;
+                const current_order = inst + text1 + text2;
+                if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+                else additional_time = 0.0;
+                previous_order = inst + text1 + text2;
 
-            flag2 = 1;
-            if (raspi == 1) fetch2(text);
-            content = content + text + '\n';
-        }
-        else {
+                flag2 = 1;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+            }
+            else {
 
-            if (menu_5[Cast.toString(args.GRID)] == 0) G = 1; //時計回り     
-            else G = -1; //反時計回り  
+                if (menu_5[Cast.toString(args.GRID)] == 0) G = 1; //時計回り     
+                else G = -1; //反時計回り  
 
-            var p1 = Math.floor(Cast.toNumber(args.RADIUS) * 100);
+                var p1 = Math.floor(Cast.toNumber(args.RADIUS) * 100);
 
-            if (p1 < min_radius) p1 = min_radius;
-            else if (p1 > max_radius) p1 = max_radius;
-            else p1 = p1;
+                if (p1 < min_radius) p1 = min_radius;
+                else if (p1 > max_radius) p1 = max_radius;
+                else p1 = p1;
 
 
-            p = p1 / screen_mode;//半径
-            grid = Math.abs((360 * (100 / p1) / (2 * Math.PI)));//角速度
+                p = p1 / screen_mode;//半径
+                grid = Math.abs((360 * (100 / p1) / (2 * Math.PI)));//角速度
 
-            log.log("円:", grid, p);
-            circleX = util.target.x + (G * (p * (Math.cos(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10))));//中心点x
-            circleY = util.target.y + (G * (-1 * (p * (Math.sin(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10)))));//中心点y
-            log.log("円2:", circleX, circleY);
-            point = 2;
+                log.log("円:", grid, p);
+                circleX = util.target.x + (G * (p * (Math.cos(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10))));//中心点x
+                circleY = util.target.y + (G * (-1 * (p * (Math.sin(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10)))));//中心点y
+                log.log("円2:", circleX, circleY);
+                point = 2;
+            }
         }
     }
 
@@ -1057,7 +1077,9 @@ class Scratch3NewBlocks {
 
 
     fetchURL21(args, util) {
-        if (mode == 1) {
+        if (mode == 1 && write_enable == 2) {
+            write_enable = 0;
+
             if (raspi == 1) {
                 const server = "http://localhost:8000?";
                 const inst = "inst_n=" + (inst_n++) + "&inst=EXECUTE";
@@ -1077,6 +1099,7 @@ class Scratch3NewBlocks {
                     .catch(error => alert('error!!'));
                 content = "";
             }
+            looks.sayforsecs({ mutation: undefined, MESSAGE: '命令実行', SECS: '5' }, util);
         }
     }
 
