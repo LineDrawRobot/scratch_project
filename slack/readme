@@ -1,3 +1,4 @@
+使い方
 slack_passに各ロボット色に対応した記述をする
 
 
@@ -5,4 +6,10 @@ slack-boltのインストール方法
 pip install slack-bolt --break-system-packages
 
 
-ver1 slackから命令を受信して処理する
+ver1 
+・slackから命令を受信して処理する
+・命令に基づきarudinoに命令を送信
+
+ver2
+・過去の投稿された命令を受け取らないように変更
+・動作状況を示すLEDを追加
