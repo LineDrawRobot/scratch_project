@@ -32,6 +32,7 @@ G = 0
 data = 0
 
 pin_num = [5, 6, 13, 19, 26, 16, 20, 21, 25]  # 使用するgpioピン番号
+power_pin = LED(17)
 n_pin = 9  # 使用するgpioピン数
 
 str1 = '0'
@@ -79,7 +80,18 @@ def admin_process(message, say):
 @app.message("instruction")
 def message_hello(message, say):
     global lock, power
-    if lock == 0 and power == 0:
+    ###過去のメッセージを無視する
+    event_ts = float(message.get("ts", 0))
+    now_ts = time.time()
+    if now_ts - event_ts > 5:
+        print(f"[INFO] Skipping old message: {message.get('text')} (ts={event_ts})")
+        return
+    ###動作中に来たメッセージを無視する
+    if  lock == 1:
+        print("block message")
+        return
+        
+    if  power == 0:
         lock = 1
         text = message["text"]
         text2 = re.sub('instruction|amp;|<|>', '', text)
@@ -93,9 +105,7 @@ def message_hello(message, say):
 
         print("動作完了")
         lock = 0
-
-    # else:
-        # print("block message")
+       
 
 
 def do_GET(path):
@@ -369,6 +379,7 @@ def do_GET(path):
         f.write(log_text)
     for i in range(n_pin):
         led_pin[i].off()
+    power_pin.off()
     os._exit(1)
 
 @app.event("message")
@@ -380,4 +391,5 @@ if __name__ == "__main__":
     # アプリを起動して、ソケットモードで Slack に接続します
     lock = 0
     power = 0
+    power_pin.on()
     SocketModeHandler(app, app_token).start()
