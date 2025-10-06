@@ -3,3 +3,6 @@ slack_passに各ロボット色に対応した記述をする
 
 slack-boltのインストール方法
 pip install slack-bolt --break-system-packages
+
+
+ver1 slackから命令を受信して処理する
