@@ -265,7 +265,7 @@ class Scratch3NewBlocks {
                             menu: "MENU3"
                         }
                     }
-                },*/
+                },
                 {
                     opcode: 'fetchURL6',
                     blockType: BlockType.COMMAND,
@@ -302,7 +302,7 @@ class Scratch3NewBlocks {
                         }
                     }
 
-                },
+                },*/
                 {
                     opcode: 'fetchURL3_2',
                     blockType: BlockType.COMMAND,
@@ -318,11 +318,11 @@ class Scratch3NewBlocks {
                             menu: 'MENU1'
                         }
                     }
-                },/*
+                },
                 {
-                    opcode: 'fetchURL6-2',
+                    opcode: 'fetchURL6_2',
                     blockType: BlockType.COMMAND,
-                    text: '[TEXT1]に[TEXT2]で旋回させる',
+                    text: '[TEXT1]に[TEXT2]度（範囲：' + min_angle + '~' + max_angle + '）[旋回させる',
                     arguments: {
                         TEXT1: {
                             type: ArgumentType.STRING,
@@ -330,18 +330,17 @@ class Scratch3NewBlocks {
                             menu: 'MENU5'
                         },
                         TEXT2: {
-                            type: ArgumentType.STRING,
-                            defaultValue: rot1,
-                            menu: 'MENU2'
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "1"
                         }
                     },
                     filter: [TargetType.SPRITE]
                 },
                 {
 
-                    opcode: 'fetchURL19-2',
+                    opcode: 'fetchURL19_2',
                     blockType: BlockType.COMMAND,
-                    text: '[GRID]に半径[RADIUS]m（範囲：' + min_radius / 100 + '~' + max_radius / 100 + '）の円軌道をさせる',
+                    text: '[GRID]に半径[RADIUS]m（範囲：' + min_radius / 100 + '~' + max_radius / 100 + '）の円軌道を[ANGLE]度（範囲：' + min_angle + '~' + max_angle + '）させる',
                     arguments: {
                         GRID: {
                             type: ArgumentType.STRING,
@@ -352,10 +351,15 @@ class Scratch3NewBlocks {
                         RADIUS: {
                             type: ArgumentType.NUMBER,
                             defaultValue: "1"
+                        },
+                        ANGLE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "1"
                         }
+
                     }
 
-                },*/
+                },
                 {
                     opcode: 'fetchURL7',
                     blockType: BlockType.LOOP,
@@ -595,11 +599,10 @@ class Scratch3NewBlocks {
         if (write_enable == 1) {
 
             var num = Math.floor(Cast.toNumber(args.TEXT1) * 100);
-log.log(num);
             if (num < min_distance) num = min_distance;
             else if (num > max_distance) num = max_distance;
             else num = num;
-log.log(num);
+
             if (mode == 1) {
                 const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
                 const inst = "&inst=TIREON";              
@@ -746,7 +749,45 @@ log.log(num);
             }
         }
     }
+    fetchURL6_2(args, util)//回転
+    {
+        if (write_enable == 1) {
+            
+            var num = Math.floor(Cast.toNumber(args.TEXT2));
+            if (num < min_angle) num = min_angle;
+            else if (num > max_angle) num = max_angle;
+            else num = num;
 
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=TURN";
+                const text1 = "&CW=" + menu_5[Cast.toString(args.TEXT1)];
+                const text2 = "&ANGLE=" + num;
+                const text = server + inst + text1 + text2;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+                previous_order = inst + text1 + text2;
+                //ステアリング補正時間
+                additional_time = correction_time;
+            }
+
+            else {
+
+                point = 1;
+                
+                if (menu_5[Cast.toString(args.TEXT1)] == 0)//時計回り
+                {
+
+                    motion.turnRight({ mutation: undefined, DEGREES: String(num)}, util);
+                }
+
+                else //反時計回り
+                {
+                    motion.turnLeft({ mutation: undefined, DEGREES: String(num)}, util);
+                }
+            }
+        }
+    }
     fetchURL7(args, util) //;繰り返す
     {
         const times = Math.round(Cast.toNumber(args.TIMES));
@@ -1168,7 +1209,57 @@ log.log(num);
             }
         }
     }
+    fetchURL19_2(args, util)//半径指定の円軌道
+    {
+        if (write_enable == 1) {
+            var num = Math.floor(Cast.toNumber(args.RADIUS) * 100);
+            if (num < min_radius) num = min_radius;
+            else if (num > max_radius) num = max_radius;
+            else num = num;
+            var num2 = Math.floor(Cast.toNumber(args.ANGLE));
+            if (num2 < min_angle) num = min_angle;
+            else if (num2 > max_angle) num = max_angle;
+            else num2 = num2;
 
+
+            if (mode == 1) {
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst = "&inst=CIRCLE3";
+                const text1 = "&CW=" + menu_5[Cast.toString(args.GRID)];
+                const text2 = "&turnsize=" + num;//+Cast.toNumber(args.RADIUS)*100;
+                const text3 = "&ANGLE=" + num2;
+                const text = server + inst + text1 + text2 + text3;
+                const current_order = inst + text1 + text2 + text3;
+                if (current_order != previous_order) additional_time = correction_time;//ステアリング補正時間
+                else additional_time = 0.0;
+                previous_order = inst + text1 + text2 + text3;
+                flag2 = 1;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
+            }
+            else {
+
+                if (menu_5[Cast.toString(args.GRID)] == 0) G = 1; //時計回り     
+                else G = -1; //反時計回り  
+
+                var p1 = Math.floor(Cast.toNumber(args.RADIUS) * 100);
+
+                if (p1 < min_radius) p1 = min_radius;
+                else if (p1 > max_radius) p1 = max_radius;
+                else p1 = p1;
+
+
+                p = p1 / screen_mode;//半径
+                grid = Math.abs((360 * (100 / p1) / (2 * Math.PI)));//角速度
+
+                log.log("円:", grid, p);
+                circleX = util.target.x + (G * (p * (Math.cos(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10))));//中心点x
+                circleY = util.target.y + (G * (-1 * (p * (Math.sin(Math.PI * (Cast.toNumber(util.target.direction)) / 180).toFixed(10)))));//中心点y
+                log.log("円2:", circleX, circleY);
+                point = 2;
+            }
+        }
+    }
     fetchURL20(args, util) //画面サイズ変更
     {
         const size = menu_9[Cast.toString(args.SIZE)];
