@@ -6,7 +6,7 @@
 
 　※serial_spiフォルダがない場合は作成する。
 
-２．メインプログラムで以下の関数を挿入してください。
+２．メインプログラムで以下の関数を挿入してください。（詳しくは
 
 　//setupに入れる
 　serial_setup();
@@ -15,9 +15,15 @@
 　//関数がちゃんと処理できた場合は変数serial_dataに情報が入っている。
 　serial_com();
 
-　//シリアル通信で情報を受け取りたいところに入れる
-　//関数がちゃんと処理できた場合は変数serial_dataに情報が入っている。
-　serial_com();
+　//動作するところに入れる、基本は↑の記述の下
+　 if(digitalRead(EXECUTE_START)==HIGH){ //ラズパイから入力される動作開始信号
+       
+      check_serial_data(); //serial_data1,serial_data2,serial_data3のデータ確認用
+     
+      xxx()   // 命令を実行するための関数を入れてください。
+ 
+      finish_instruction();　//命令を終えたことをラズパイに知らせる関数
+    }
 
 
 
