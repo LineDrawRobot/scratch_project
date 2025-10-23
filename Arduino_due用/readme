@@ -6,19 +6,19 @@
 
 　※serial_spiフォルダがない場合は作成する。
 
-２．メインプログラムで以下の関数を挿入してください。（詳しくは
+２．メインプログラムで以下の関数を挿入してください。（詳しくはprototype312.inoを参考に）
 
 　//setupに入れる
 　serial_setup();
 
 　//シリアル通信で情報を受け取りたいところに入れる
-　//関数がちゃんと処理できた場合は変数serial_dataに情報が入っている。
+　//関数がちゃんと処理できた場合は変数serial_data1, serial_data2, serial_data3に情報が入っている。
 　serial_com();
 
 　//動作するところに入れる、基本は↑の記述の下
 　 if(digitalRead(EXECUTE_START)==HIGH){ //ラズパイから入力される動作開始信号
        
-      check_serial_data(); //serial_data1,serial_data2,serial_data3のデータ確認用
+      check_serial_data(); //serial_data1, serial_data2, serial_data3のデータ確認用
      
       xxx()   // 命令を実行するための関数を入れてください。
  
