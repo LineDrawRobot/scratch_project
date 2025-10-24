@@ -1,5 +1,6 @@
 使い方
-slack_passに各ロボット色に対応した記述をする
+１．　/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocksに配置する
+２．　同ファイル内にslack_passを配置し、各ロボット色に対応した記述をする
 
 
 slack-boltのインストール方法
