@@ -339,21 +339,29 @@ void periodic_control() {
 
   // サーボがオンなら
   if (digitalRead(SERVO_ON) == HIGH) {
-    // 粉の排出
+    // 粉の排出 ← 変更？
     powder_drop();
-
+　　
+    //シリアル通信で情報を受け取りたいところに入れる
+　　//関数がちゃんと処理できた場合は変数serial_data1, serial_data2, serial_data3に情報が入っている。
+    //データ内容はGPIO.pdfを参考
     serial_com();
     
-    if(digitalRead(EXECUTE_START)==HIGH){
+    if(digitalRead(EXECUTE_START)==HIGH){　//ラズパイから入力される動作開始信号
         
-      check_serial_data();
-      // 走行モードの取得
-        int mode = direction_control();
-        // 走行モードに応じて制御
-        speed_control(mode, yaw_rate, yaw_angle);
-        delay(5000);
-
-        finish_instruction();
+      check_serial_data(); //serial_data1, serial_data2, serial_data3のデータ確認用
+      
+      // 走行モードの取得 ← 変更？
+      int mode = direction_control();
+      
+      // 走行モードに応じて制御 ← 変更？
+      speed_control(mode, yaw_rate, yaw_angle);
+      
+      //動作時間を5秒と想定して模擬
+      delay(5000);
+      
+      //命令を終えたことをラズパイに知らせる関数
+      finish_instruction();
     }
   } else {
     // サーボ停止の場合
@@ -798,3 +806,4 @@ float calibrate_angle(float now_angle, float target_angle) {
   }
   return return_angle;
 }
+
