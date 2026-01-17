@@ -225,7 +225,7 @@ def do_GET(path):
             time.sleep(timer1)
             led_pin[7].on()
             time.sleep(timer1)
-                """
+        """
         elif inst['inst'][0] == 'CIRCLE':
             led_pin[2].off()
             led_pin[3].off()
