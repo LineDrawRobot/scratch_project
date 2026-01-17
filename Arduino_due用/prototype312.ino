@@ -341,13 +341,13 @@ void periodic_control() {
   if (digitalRead(SERVO_ON) == HIGH) {
     // 粉の排出 ← 変更？
     powder_drop();
-　　
+
     //シリアル通信で情報を受け取りたいところに入れる
-　　//関数がちゃんと処理できた場合は変数serial_data1, serial_data2, serial_data3に情報が入っている。
+    //関数がちゃんと処理できた場合は変数serial_data1, serial_data2, serial_data3に情報が入っている。
     //データ内容はGPIO.pdfを参考
     serial_com();
     
-    if(digitalRead(EXECUTE_START)==HIGH){　//ラズパイから入力される動作開始信号
+    if(digitalRead(EXECUTE_START)==HIGH){   //ラズパイから入力される動作開始信号
         
       check_serial_data(); //serial_data1, serial_data2, serial_data3のデータ確認用
       
@@ -806,4 +806,3 @@ float calibrate_angle(float now_angle, float target_angle) {
   }
   return return_angle;
 }
-
