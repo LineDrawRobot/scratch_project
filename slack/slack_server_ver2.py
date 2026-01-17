@@ -225,7 +225,7 @@ def do_GET(path):
             time.sleep(timer1)
             led_pin[7].on()
             time.sleep(timer1)
-
+                """
         elif inst['inst'][0] == 'CIRCLE':
             led_pin[2].off()
             led_pin[3].off()
@@ -267,7 +267,7 @@ def do_GET(path):
                     led_pin[6].off()
                     led_pin[7].on()
 
-                """
+
                             elif op['ptn']=='2':
                                 if op['CW']=='0':
                                     led_pin[4].on()
@@ -352,7 +352,8 @@ def do_GET(path):
         
             else:
                 print("Value setting is complete")
-
+            led_pin[2].off()
+            led_pin[3].off()
             if op['CW'] == '0':
                 led_pin[4].on()
                 led_pin[5].off()
