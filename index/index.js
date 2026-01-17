@@ -374,7 +374,7 @@ class Scratch3NewBlocks {
                     isEdgeActivated: true
                 },
 
-
+/*
                 {
                     opcode: 'fetchURL11',
                     blockType: BlockType.COMMAND,
@@ -386,7 +386,7 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
-                /*
+                
                 {
                     opcode:'fetchURL14',
                     blockType:BlockType.COMMAND,
@@ -669,13 +669,12 @@ class Scratch3NewBlocks {
         if (write_enable == 1) {
             if (mode == 1) {
 
-                if (menu_4[Cast.toString(args.TEXT)] == 1) {
-                    flag = 1;
-                }
-                else {
-                    flag = 0;
-
-                }
+                const server = "http://localhost:8000?" + "inst_n=" + (inst_n++);
+                const inst= "&inst=POWDER";
+                const text1 = "&INOUT="+menu_4[Cast.toString(args.TEXT)];
+                const text = server + inst + text1;
+                if (raspi == 1) fetch2(text);
+                content = content + text + '\n';
             }
             else {
                 if (menu_4[Cast.toString(args.TEXT)] == 1)//出す
