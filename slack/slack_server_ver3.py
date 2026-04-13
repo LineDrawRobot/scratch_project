@@ -15,7 +15,7 @@ import traceback
 import datetime
 
 
-with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/slack_pass.txt", "r", encoding="utf-8") as f:
+with open("/home/pi/slack/slack_pass.txt", "r", encoding="utf-8") as f:
     app_token = f.readline().strip()
     bot_token = f.readline().strip()
 
@@ -158,7 +158,7 @@ def serial_send(data1,data2,data3):
         log_text = f"[{now}] {repr(e)}\n{traceback.format_exc()}\n"
 
         # ファイルに追記モードで書き込み
-        with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/log.txt", "a", encoding="utf-8") as f:
+        with open("/home/pi/slack/log.txt", "a", encoding="utf-8") as f:
             f.write(log_text)
         reset_pin()
         os._exit(1)       
@@ -259,7 +259,7 @@ def do_GET(path):
     log_text = f"[{now}] {repr(e)}\n{traceback.format_exc()}\n"
 
     # ファイルに追記モードで書き込み
-    with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/log.txt", "a", encoding="utf-8") as f:
+    with open("/home/pi/slack/log.txt", "a", encoding="utf-8") as f:
         f.write(log_text)
     reset_pin()
     os._exit(1)
