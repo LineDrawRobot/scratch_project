@@ -1,13 +1,26 @@
 使い方
+（初期設定）
 １．以下のコマンドを打って、全てをアップデートする。
 　　sudo apt update
   　sudo apt upgrade
 ２．/home/pi/　に slakフォルダを追加する
-３．/home/pi/slackにslack_server.pyとslack_pass.txtを配置する
+３．slack_server.pyとslack_pass.txtをDLして、/home/pi/slackに配置する
 ４．slack_passに各ロボット色に対応した記述をする（secretを参考）
 ５．以下のコマンドを打って、slack-boltをインストールする
 　　pip install slack-bolt --break-system-packages
 
+（手動起動）
+１．/home/pi/slackに移動して以下のコマンドを打つ
+   python slack_server.py
+
+(自動起動させたい場合）
+１．slack_server.serviceをDLし、/etc/systemd/system/に配置する
+２．以下のコマンドを打つ
+　sudo systemctl daemon-reexec
+  sudo systemctl daemon-reload
+  sudo systemctl enable slack_server.service
+  reboo
+３．ラズパイ起動時にslack_server.pyが自動起動する　
 
 ver1 
 ・slackから命令を受信して処理する
