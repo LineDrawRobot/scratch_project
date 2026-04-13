@@ -1,13 +1,12 @@
 使い方
-１．以下のコマンドを打つ
+１．以下のコマンドを打って、全てをアップデートする。
 　　sudo apt update
   　sudo apt upgrade
-２．　/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocksに配置する
-３．　同ファイル内にslack_passを配置し、各ロボット色に対応した記述をする
-
-
-slack-boltのインストール方法
-pip install slack-bolt --break-system-packages
+２． /home/pi/　に slakフォルダを追加する
+３． /home/pi/slackにslack_server.pyを配置する
+４．　同ファイル内にslack_passを配置し、各ロボット色に対応した記述をする
+５．以下のコマンドを打って、slack-boltをインストールする
+　　pip install slack-bolt --break-system-packages
 
 
 ver1 
