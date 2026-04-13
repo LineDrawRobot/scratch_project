@@ -14,7 +14,7 @@ import traceback
 import datetime
 
 
-with open("/home/pi/scratch/scratch-vm/src/extensions/scratch3_newblocks/slack_pass.txt", "r", encoding="utf-8") as f:
+with open("/home/pi/slack/slack_pass.txt", "r", encoding="utf-8") as f:
     app_token = f.readline().strip()
     bot_token = f.readline().strip()
 
