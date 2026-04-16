@@ -2,13 +2,12 @@
 
 １．GPIO.pdfを参考に配線する
 
-２．serial_spi.hを以下のフォルダに入れてコンパイルする
-
-　C:\Users\ユーザー名\Documents\Arduino IDE\libraries\serial_spi\　
-
-　※serial_spiフォルダがない場合は作成する。
+２．serial_spi.hをメインプログラムがあるフォルダに入れてコンパイルする  ←　2026/4 変更
 
 ３．メインプログラムで以下の関数を挿入してください。（詳しくはprototype312.inoを参考に）
+
+  //ヘッダファイルをインクルード
+  #include  "serial_spi.h"
 
 　//setupに入れる
 　serial_setup();
