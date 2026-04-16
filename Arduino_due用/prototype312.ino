@@ -8,7 +8,7 @@ Issue #11
 #include <stdint.h>
 #include <math.h>
 #include <LiquidCrystal_I2C.h>
-#include <serial_spi.h>
+#include "serial_spi.h"
 
 // IMU用インスタンス
 BNO08x myIMU;
