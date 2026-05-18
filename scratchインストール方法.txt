@@ -18,3 +18,8 @@ cd ../scratch-gui
 npm install
 sudo npm link scratch-vm
 npm start
+
+/*scratchを起動*/
+
+ブラウザのURLに以下を入力する
+http://localhost:8601/
