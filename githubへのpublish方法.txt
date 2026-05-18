@@ -1,0 +1,55 @@
+〇　windows OS を前提とする
+
+１．Git bashをダウンロードし、インストール
+【参考】https://qiita.com/suke_masa/items/404f06309bb32ca6c9c5
+
+２．Node.jsをダウンロードし、インストール
+https://nodejs.org/ja
+
+３．以下２つを自分のGitHubリポジトリにフォークする
+
+https://github.com/LLK/scratch-gui
+https://github.com/LLK/scratch-vm
+
+４．フォークしたプロジェクトをローカルにクローンする
+
+git clone https://github.com/[自分のリポジトリ名]/scratch-gui
+git clone https://github.com/[自分のリポジトリ名]/scratch-vm
+
+５．依存パッケージのインストールとプロジェクトのリンクし、動作確認
+
+cd scratch-vm 
+npm install 
+npm link
+cd ..
+cd scratch-gui
+npm install
+npm link scratch-vm 
+npm start
+
+６．githubとの連携
+My Nameとmyname@example.comを自分のgithubアカウントに合わせる
+
+git config --global user.name "My Name"
+git config --global user.email myname@example.com
+
+
+６．gitbashの公開ページ設定
+cd ../scratch-gui
+npm run build
+npm run deploy  
+※↑でフォルダを指定したい場合
+npm run deploy -- -e new_version
+
+
+※初deploy時に認証が入る。認証後もう一度６．のコマンドを全て打つ
+
+
+７．githubの公開ページの設定
+自分のgithubレポジトリーからscratch-guiを開く
+settingsをクリック
+pagesをクリック
+Branchをgh-pagesにしてsave
+上部にリンクが出てくるので、そちらをブラウザで開く
+
+
