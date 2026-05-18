@@ -1,0 +1,14 @@
+認証が期限切れの場合以下を実行
+
+
+１．https://github.com/settings/tokensにアクセスしてログイン
+２．画面が開いたら、「Generate new token」 ＞ 「Generate new token (classic)」 の順に進んでください。
+３．NoteをPC名、　期限を設定、repo【全体】をチェックし、generate tokenをクリック
+４．tokenをコピーする
+５．git bash上で
+  git remote set-url origin https://[あなたのGitHubユーザー名]:[コピーしたトークン]@github.com/[あなたのGitHubユーザー名]/[リポジトリ名].git
+【入力例】
+  ユーザー名が taro、リポジトリ名が my-app、トークンが ghp_12345 の場合：
+  git remote set-url origin [https://taro:ghp_12345@github.com/taro/my-app.git](https://taro:ghp_12345@github.com/taro/my-app.git)
+
+６．npm run deployを試してみる
