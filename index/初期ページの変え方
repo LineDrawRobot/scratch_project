@@ -1,0 +1,9 @@
+１．　
+  初期状態にしたいプロジェクト（.sb3）を用意し、
+　拡張子を .zip に変更して解凍します。中から以下のファイル群を取り出し
+２．
+  scratch/scratch-gui/src/lib/default-project/　に　上記ファイル群をいれる
+３．
+　project-data.jsの30行目をproject.jsonの中身に書き換える
+４．
+　src/lib/default-project/index.jsを書き換える　コメントを参考に
