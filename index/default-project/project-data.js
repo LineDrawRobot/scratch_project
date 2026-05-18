@@ -1,0 +1,35 @@
+import {defineMessages} from 'react-intl';
+import sharedMessages from '../shared-messages';
+
+let messages = defineMessages({
+    meow: {
+        defaultMessage: 'Meow',
+        description: 'Name for the meow sound',
+        id: 'gui.defaultProject.meow'
+    },
+    variable: {
+        defaultMessage: 'my variable',
+        description: 'Name for the default variable',
+        id: 'gui.defaultProject.variable'
+    }
+});
+
+messages = {...messages, ...sharedMessages};
+
+const defaultTranslator = msgObj => msgObj.defaultMessage;
+
+/**
+ * Generate a localized version of the default project
+ * @param {function} translateFunction a function to use for translating the default names
+ * @return {object} the project data json for the default project
+ */
+const projectData = translateFunction => {
+    const translator = translateFunction || defaultTranslator;
+    return (
+    
+       {"targets":[{"isStage":true,"name":"Stage","variables":{"`jEk@4|i[#Fk?(8x)AV.-my variable":["変数",0]},"lists":{},"broadcasts":{},"blocks":{},"comments":{},"currentCostume":1,"costumes":[{"name":"背景1","dataFormat":"svg","assetId":"cd21514d0531fdffb22204e0ec5ed84a","md5ext":"cd21514d0531fdffb22204e0ec5ed84a.svg","rotationCenterX":240,"rotationCenterY":180},{"name":"背景","bitmapResolution":1,"dataFormat":"svg","assetId":"5978c66a8a972c2b6f6e191a21601468","md5ext":"5978c66a8a972c2b6f6e191a21601468.svg","rotationCenterX":241,"rotationCenterY":182}],"sounds":[{"name":"ポップ","assetId":"83a9787d4cb6f3b7632b4ddfebf74367","dataFormat":"wav","format":"","rate":48000,"sampleCount":1123,"md5ext":"83a9787d4cb6f3b7632b4ddfebf74367.wav"}],"volume":100,"layerOrder":0,"tempo":60,"videoTransparency":50,"videoState":"on","textToSpeechLanguage":null},{"isStage":false,"name":"[2]icon_Scratch","variables":{},"lists":{},"broadcasts":{},"blocks":{"`J6j5ON%hlC3[ZC}ycn$":{"opcode":"newblocks_fetchURL18","next":"X4p=NOs:H:*URu8tf!DV","parent":null,"inputs":{"setX":[1,[4,"0"]],"setY":[1,[4,"0"]],"setTurn":[1,[4,"90"]]},"fields":{},"shadow":false,"topLevel":true,"x":1762,"y":663,"comment":"Kacs(?a/tf#A(@CU?J+a"},"X4p=NOs:H:*URu8tf!DV":{"opcode":"newblocks_fetchURL20","next":"@j8/|uS?ght^cpOWm`c1","parent":"`J6j5ON%hlC3[ZC}ycn$","inputs":{},"fields":{"SIZE":["1cm",null]},"shadow":false,"topLevel":false},"@j8/|uS?ght^cpOWm`c1":{"opcode":"newblocks_clear","next":null,"parent":"X4p=NOs:H:*URu8tf!DV","inputs":{},"fields":{},"shadow":false,"topLevel":false},"2[O5^A,!yAW=L*.p%x6]":{"opcode":"newblocks_fetchURL16","next":"l,-eg~{F]f=IaUN}eV@X","parent":null,"inputs":{},"fields":{},"shadow":false,"topLevel":true,"x":637,"y":284},"FauZ.uHzE+^X(iBA!:f2":{"opcode":"newblocks_fetchURL2","next":null,"parent":null,"inputs":{},"fields":{},"shadow":false,"topLevel":true,"x":636,"y":474},"l,-eg~{F]f=IaUN}eV@X":{"opcode":"newblocks_fetchURL1","next":null,"parent":"2[O5^A,!yAW=L*.p%x6]","inputs":{},"fields":{"TEXT":["シミュレーター",null]},"shadow":false,"topLevel":false,"comment":"r_GLbr8oz%PzVc9dp:Z]"},"7Z7dYHqPK+YIoJ$*-}/M":{"opcode":"newblocks_fetchURL21","next":null,"parent":null,"inputs":{"PASS":[1,[10,"　　　　　"]]},"fields":{},"shadow":false,"topLevel":true,"x":668,"y":1193,"comment":"XX*m`*1XS(;YYOm:96TT"}},"comments":{"Kacs(?a/tf#A(@CU?J+a":{"blockId":"`J6j5ON%hlC3[ZC}ycn$","x":2289.653352525499,"y":291.40740740740796,"width":256.296142578125,"height":305.1851806640625,"minimized":false,"text":"シミュレータを動かすときは\n動かす前にこちらを設定して実行してください。"},"XX*m`*1XS(;YYOm:96TT":{"blockId":"7Z7dYHqPK+YIoJ$*-}/M","x":1240.0925896256053,"y":1193.0370370370358,"width":336.2962646484375,"height":162.962890625,"minimized":false,"text":"ロボットが動かしたいときは\nこのブロックにパスワードを入れて\nクリックしてね。"},"r_GLbr8oz%PzVc9dp:Z]":{"blockId":"l,-eg~{F]f=IaUN}eV@X","x":1008.1805514582882,"y":126.51851851851865,"width":600,"height":174.8148193359375,"minimized":false,"text":"この下ににやりたいことをいれて最後にプログラム終了をいれください。\n\n最初はシミュレータモードで実行してみよう\n\nうまくいったらロボットモードでロボットを動かそう"}},"currentCostume":0,"costumes":[{"name":"[2]icon_Scratch","bitmapResolution":2,"dataFormat":"png","assetId":"ffef3feb8fa5045f499371ab6fc58730","md5ext":"ffef3feb8fa5045f499371ab6fc58730.png","rotationCenterX":80,"rotationCenterY":50}],"sounds":[],"volume":100,"layerOrder":1,"visible":true,"x":0,"y":0,"size":100,"direction":90,"draggable":false,"rotationStyle":"all around"}],"monitors":[],"extensions":["newblocks"],"meta":{"semver":"3.0.0","vm":"5.0.198","agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"}}
+    
+    );
+};
+
+export default projectData;
