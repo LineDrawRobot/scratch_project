@@ -176,7 +176,7 @@ const projectData = translateFunction => {
                     "width": 256.296142578125,
                     "height": 305.1851806640625,
                     "minimized": false,
-                    "text": "シミュレータを動かすときは\n動かす前にこちらを設定して実行してください。"
+                    "text": "シミュレータを動かすときは\n動かす前にこちらを設定して実行してね。"
                 },
                 "XX*m`*1XS(;YYOm:96TT": {
                     "blockId": "7Z7dYHqPK+YIoJ$*-}/M",
@@ -185,7 +185,7 @@ const projectData = translateFunction => {
                     "width": 336.2962646484375,
                     "height": 162.962890625,
                     "minimized": false,
-                    "text": "ロボットが動かしたいときは\nこのブロックにパスワードを入れて\nクリックしてね。"
+                    "text": "ロボットを動かしたいときは\nこのブロックにパスワードを入れて\nクリックしてね。"
                 },
                 "r_GLbr8oz%PzVc9dp:Z]": {
                     "blockId": "l,-eg~{F]f=IaUN}eV@X",
@@ -194,7 +194,7 @@ const projectData = translateFunction => {
                     "width": 600,
                     "height": 174.8148193359375,
                     "minimized": false,
-                    "text": "この下ににやりたいことをいれて最後にプログラム終了をいれください。\n\n最初はシミュレータモードで実行してみよう\n\nうまくいったらロボットモードでロボットを動かそう"
+                    "text": "この下にやりたいことをいれて、最後にプログラム終了をいれてね。\n\n最初はシミュレータモードで実行してみよう\n\nうまくいったらロボットモードでロボットを動かそう。"
                 }
             },
             "currentCostume": 0,
